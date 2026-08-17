@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Cricket v1 - Ultimate Arcade Edition</title>
+    <style>
+        * { box-sizing: border-box; user-select: none; }
+        body {
+            background-color: #0d0e15;
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+        }
+        #game-container {
+            position: relative;
+            text-align: center;
+            border: 4px solid #333;
+            padding: 20px;
+            background: #141622;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            max-width: 730px;
+            width: 100%;
+        }
+        .header-title {
+            margin: 0 0 15px 0;
+            color: #00ffcc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 22px;
+            text-shadow: 2px 2px #ff0055;
+        }
+        .game-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        .canvas-wrapper {
+            position: relative;
+            width: 400px;
+            height: 600px;
+            flex-shrink: 0;
+        }
+        canvas {
+            border: 4px solid #fff;
+            background-color: #2e8b57;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            display: block;
+        }
+
+        /* RIGHT SIDEBAR DASHBOARD */
+        .sidebar {
+            width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-align: left;
+        }
+        .widget-card {
+            background: #090a10;
+            border: 2px solid #00ffcc;
+            border-radius: 4px;
+            padding: 12px;
+            box-shadow: 3px 3px 0px #ff0055;
+        }
+        .widget-header {
+            font-size: 11px;
+            color: #ff0055;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            border-bottom: 1px dashed #333;
+            padding-bottom: 4px;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .stat-box {
+            background: #141622;
+            border: 1px solid #222538;
+            padding: 6px 8px;
+            border-radius: 3px;
+        }
+        .stat-label {
+            font-size: 10px;
+            color: #888;
+            margin-bottom: 2px;
+        }
+        .stat-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        .stat-value.highlight {
+            color: #00ffcc;
+        }
+
+        /* Power Bar Widget */
+        .power-bar-container {
+            width: 100%;
+            background: #111;
+            border: 2px solid #00ffcc;
+            height: 16px;
+            position: relative;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+        #power-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff0055, #ffcc00, #00ffcc);
+            transition: width 0.1s linear;
+        }
+
+        /* Controls Help Box */
+        .key-legend {
+            font-size: 10px;
+            line-height: 1.6;
+            color: #ddd;
+        }
+        .key-badge {
+            background: #222538;
+            color: #00ffcc;
+            border: 1px solid #00ffcc;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        /* OVERLAYS */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 400px;
+            height: 600px;
+            background: rgba(13, 14, 21, 0.95);
+            border: 4px solid #00ffcc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #tips-modal {
+            display: none;
+            z-index: 20;
+            border-color: #ff0055;
+            text-align: left;
+        }
+        .title {
+            color: #00ffcc;
+            font-size: 22px;
+            margin-bottom: 2px;
+            text-shadow: 2px 2px #ff0055;
+        }
+        .subtitle {
+            color: #ffcc00;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+        .author-tag {
+            color: #ff0055;
+            font-size: 10px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        .menu-btn {
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            margin: 3px 0;
+            width: 220px;
+            box-shadow: 3px 3px 0px #ff0055;
+            transition: transform 0.1s;
+        }
+        .menu-btn:hover { transform: scale(1.03); background: #fff; }
+        .rate-btn { background: #ffcc00; box-shadow: 3px 3px 0px #000; }
+        .share-btn { background: #9900ff; color: #fff; box-shadow: 3px 3px 0px #00ffcc; }
+        .tips-btn { background: #ff0055; color: #fff; box-shadow: 3px 3px 0px #00ffcc; }
+        .mode-select-container { margin: 4px 0 8px 0; display: flex; gap: 6px; }
+        .mode-btn {
+            background: #141622;
+            color: #00ffcc;
+            border: 2px solid #00ffcc;
+            padding: 5px 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .mode-btn.active { background: #00ffcc; color: #000; }
+        .tip-box {
+            background: #1a1c2e;
+            border: 2px dashed #00ffcc;
+            padding: 8px;
+            margin-top: 8px;
+            font-size: 10px;
+            color: #ffcc00;
+            line-height: 1.4;
+        }
+        .dev-footer {
+            margin-top: 15px;
+            font-size: 11px;
+            color: #888;
+            border-top: 1px solid #222;
+            padding-top: 10px;
+        }
+
+        @media (max-width: 680px) {
+            .game-layout { flex-direction: column; align-items: center; }
+            .sidebar { width: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h2 class="header-title">🏏 PIXEL CRICKET V1</h2>
+    
+    <div class="game-layout">
+        <!-- GAME CANVAS COLUMN -->
+        <div class="canvas-wrapper">
+            <!-- START SCREEN OVERLAY -->
+            <div id="start-screen" class="overlay">
+                <div class="title">PIXEL CRICKET</div>
+                <div class="subtitle">v1.0 Ultimate Arcade Edition</div>
+                <div class="author-tag">Created by Odd Jobs Dev (Vimal Ram)</div>
+
+                <div style="font-size: 10px; color: #aaa; margin-bottom: 2px;">SELECT GAME MODE:</div>
+                <div class="mode-select-container">
+                    <button id="btn-solo" class="mode-btn active" onclick="setMode('SOLO')">SOLO</button>
+                    <button id="btn-vs" class="mode-btn" onclick="setMode('VS')">2P VS</button>
+                    <button id="btn-tourney" class="mode-btn" onclick="setMode('CUP')">🏆 WORLD CUP</button>
+                </div>
+
+                <button class="menu-btn" onclick="startGame()">▶ START GAME</button>
+                <button class="menu-btn share-btn" onclick="shareGame()">🔗 SHARE GAME</button>
+                <button class="menu-btn tips-btn" onclick="openTips()">❓ GAME GUIDE</button>
+                <button class="menu-btn rate-btn" onclick="rateGame()">⭐ RATE ON ITCH.IO</button>
+                
+                <div style="margin-top: 10px; font-size: 11px; color: #00ffcc;">
+                    HIGH SCORE: <span id="high-score-val">0</span>
+                </div>
+            </div>
+
+            <!-- TIPS MODAL OVERLAY -->
+            <div id="tips-modal" class="overlay">
+                <div class="title" style="font-size: 18px; color: #ff0055; text-align: center;">📜 GAME GUIDE</div>
+                
+                <div style="font-size: 10px; color: #fff; line-height: 1.5;">
+                    • <strong>LEFT/RIGHT ARROWS:</strong> Position batsman.<br>
+                    • <strong>SPACEBAR:</strong> Swing bat.<br>
+                    • <strong>UP ARROW:</strong> Lofted Power Shot.<br>
+                    • <strong>DOWN ARROW:</strong> Grounded Defensive Drive.<br>
+                    • <strong>KEY 'P':</strong> Trigger Super Power Shot (When Meter Full)! ⚡
+                </div>
+
+                <div class="tip-box">
+                    🔥 <strong>PITCH & BOWLER TYPES:</strong><br>
+                    • <strong>GREEN PITCH:</strong> High Pace & Bounce.<br>
+                    • <strong>DUSTY PITCH:</strong> Heavy Spin & Late Break.<br>
+                    • Watch bowler type indicators before every delivery!
+                </div>
+
+                <button class="menu-btn" style="margin: 12px auto 0 auto; display: block; width: 120px; font-size: 11px;" onclick="closeTips()">✖ CLOSE</button>
+            </div>
+
+            <canvas id="gameCanvas" width="400" height="600"></canvas>
+        </div>
+
+        <!-- RIGHT SIDEBAR DASHBOARD -->
+        <div class="sidebar">
+            
+            <!-- MATCH STATUS WIDGET -->
+            <div class="widget-card">
+                <div class="widget-header">📊 MATCH DASHBOARD</div>
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">MODE</div>
+                        <div id="innings-text" class="stat-value highlight">SOLO</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">TARGET</div>
+                        <div id="target" class="stat-value highlight">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">SCORE</div>
+                        <div id="score-wickets" class="stat-value">0/0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">BALLS</div>
+                        <div id="balls-left" class="stat-value" style="color:#ff0055;">6</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENVIRONMENT WIDGET -->
+            <div class="widget-card">
+                <div class="widget-header">🌱 MATCH CONDITIONS</div>
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">PITCH TYPE</div>
+                        <div id="pitch-display" class="stat-value" style="font-size:11px; color:#00ffcc;">NORMAL</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">BOWLER</div>
+                        <div id="bowler-display" class="stat-value" style="font-size:11px; color:#ffcc00;">PACER</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POWER METER WIDGET -->
+            <div class="widget-card">
+                <div class="widget-header">⚡ POWER SHOT METER</div>
+                <div style="font-size: 9px; color: #aaa; margin-bottom: 4px;">Fill meter to unlock <strong>KEY 'P'</strong></div>
+                <div class="power-bar-container">
+                    <div id="power-bar-fill"></div>
+                </div>
+            </div>
+
+            <!-- CONTROLS & HELP WIDGET -->
+            <div class="widget-card">
+                <div class="widget-header">🎮 QUICK CONTROLS</div>
+                <div class="key-legend">
+                    <div><span class="key-badge">◀</span> <span class="key-badge">▶</span> Move | <span class="key-badge">▲</span> Loft | <span class="key-badge">▼</span> Ground</div>
+                    <div><span class="key-badge">SPACE</span> Swing | <span class="key-badge">P</span> Power Shot</div>
+                </div>
+                <button class="menu-btn tips-btn" style="width:100%; margin-top:8px; font-size:10px; padding:5px;" onclick="openTips()">❓ DETAILED GUIDE</button>
+            </div>
+
+        </div>
+    </div>
+    
+    <div class="dev-footer">
+        Created by <span style="color:#00ffcc">Odd Jobs Dev</span> (Vimal Ram)
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// --- AUDIO SYSTEM ---
+let audioCtx = null;
+function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playTone(freq, type, duration, vol=0.3) {
+    if (!audioCtx) return;
+    let osc = audioCtx.createOscillator();
+    let gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + duration);
+}
+
+function playHitSound(isBigShot) {
+    playTone(isBigShot ? 400 : 220, 'triangle', 0.15, 0.4);
+}
+
+function playWicketSound() {
+    playTone(120, 'sawtooth', 0.35, 0.5);
+}
+
+function playCheerSound() {
+    for (let i = 0; i < 5; i++) {
+        setTimeout(() => playTone(300 + i * 100, 'sine', 0.1, 0.1), i * 50);
+    }
+}
+
+// --- GAME CONFIG & STATE ---
+const TOTAL_BALLS = 6;
+let gameState = 'MENU';
+let previousState = 'MENU';
+let gameMode = 'SOLO'; // SOLO, VS, CUP
+let cupStage = 1; // 1: QF, 2: SF, 3: FINAL
+
+let currentInnings = 1;
+let p1Score = 0;
+
+let score = 0;
+let wickets = 0;
+let ballsBowled = 0;
+let targetRuns = 0;
+let matchResult = "";
+let message = "";
+let feedbackText = "";
+let feedbackTimer = 0;
+
+let pitchType = 'NORMAL'; // NORMAL, GREEN, DUSTY
+let bowlerType = 'PACER';  // PACER, SPINNER
+
+let powerBar = 0;
+let screenShakeTimer = 0;
+let crowdFlashTimer = 0;
+let particles = [];
+
+let ball = { x: 200, y: 120, radius: 5, speedY: 0, speedX: 0, type: 'NORMAL', isBowled: false, isHit: false };
+let bowler = { x: 200, y: 70 };
+let player = { x: 200, y: 520, speed: 5, minX: 140, maxX: 260, isSwinging: false, swingTimer: 0 };
+let keys = { Left: false, Right: false, Up: false, Down: false };
+
+let highScore = localStorage.getItem('pixel_cricket_high_score') || 0;
+document.getElementById('high-score-val').innerText = highScore;
+
+window.addEventListener('keydown', (e) => {
+    if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "KeyP"].indexOf(e.code) > -1) {
+        e.preventDefault();
+    }
+    initAudio();
+    if (gameState === 'TIPS') return;
+
+    if (e.code === 'ArrowLeft') keys.Left = true;
+    if (e.code === 'ArrowRight') keys.Right = true;
+    if (e.code === 'ArrowUp') keys.Up = true;
+    if (e.code === 'ArrowDown') keys.Down = true;
+    if (e.code === 'KeyP') triggerPowerShot();
+    if (e.code === 'Space') {
+        if (gameState === 'PLAYING') swingBat();
+        else if (gameState === 'GAMEOVER') resetFullMatch();
+    }
+});
+
+window.addEventListener('keyup', (e) => {
+    if (e.code === 'ArrowLeft') keys.Left = false;
+    if (e.code === 'ArrowRight') keys.Right = false;
+    if (e.code === 'ArrowUp') keys.Up = false;
+    if (e.code === 'ArrowDown') keys.Down = false;
+});
+
+function openTips() {
+    previousState = gameState;
+    gameState = 'TIPS';
+    document.getElementById('tips-modal').style.display = 'flex';
+}
+
+function closeTips() {
+    document.getElementById('tips-modal').style.display = 'none';
+    gameState = previousState;
+}
+
+function setMode(mode) {
+    gameMode = mode;
+    document.getElementById('btn-solo').classList.toggle('active', mode === 'SOLO');
+    document.getElementById('btn-vs').classList.toggle('active', mode === 'VS');
+    document.getElementById('btn-tourney').classList.toggle('active', mode === 'CUP');
+}
+
+function shareGame() {
+    const shareData = {
+        title: 'Pixel Cricket v1',
+        text: 'Check out Pixel Cricket v1 by Odd Jobs Dev (Vimal Ram)!',
+        url: window.location.href
+    };
+    if (navigator.share) navigator.share(shareData).catch(() => {});
+    else { navigator.clipboard.writeText(window.location.href); alert("Game URL copied to clipboard!"); }
+}
+
+function rateGame() { window.open("https://itch.io", "_blank"); }
+
+function startGame() {
+    document.getElementById('start-screen').style.display = 'none';
+    cupStage = 1;
+    resetFullMatch();
+}
+
+function randomizePitchAndBowler() {
+    const pitches = ['NORMAL', 'GREEN', 'DUSTY'];
+    const bowlers = ['PACER', 'SPINNER'];
+    pitchType = pitches[Math.floor(Math.random() * pitches.length)];
+    bowlerType = bowlers[Math.floor(Math.random() * bowlers.length)];
+    
+    document.getElementById('pitch-display').innerText = pitchType;
+    document.getElementById('bowler-display').innerText = bowlerType;
+}
+
+function resetFullMatch() {
+    score = 0;
+    wickets = 0;
+    ballsBowled = 0;
+    currentInnings = 1;
+    p1Score = 0;
+    powerBar = 0;
+    gameState = 'PLAYING';
+    matchResult = "";
+    feedbackText = "";
+
+    randomizePitchAndBowler();
+
+    if (gameMode === 'SOLO') {
+        targetRuns = Math.floor(Math.random() * 20) + 15;
+        message = `SOLO: CHASE ${targetRuns} RUNS IN 6 BALLS!`;
+    } else if (gameMode === 'CUP') {
+        let stageName = cupStage === 1 ? "QUARTER-FINAL" : (cupStage === 2 ? "SEMI-FINAL" : "WORLD CUP FINAL");
+        targetRuns = 15 + (cupStage * 8);
+        message = `🏆 ${stageName}: CHASE ${targetRuns} RUNS!`;
+    } else {
+        targetRuns = 0;
+        message = "PLAYER 1: SET A TARGET IN 6 BALLS!";
+    }
+
+    updateUI();
+    bowlBall();
+}
+
+function bowlBall() {
+    if (gameState !== 'PLAYING' || ballsBowled >= TOTAL_BALLS || wickets >= 3) return;
+
+    ball.x = 200 + (Math.random() * 20 - 10);
+    ball.y = 120;
+    
+    let baseSpeed = pitchType === 'GREEN' ? 8 : (pitchType === 'DUSTY' ? 5 : 6);
+    
+    if (bowlerType === 'PACER') {
+        ball.type = Math.random() < 0.4 ? 'FAST' : 'NORMAL';
+        ball.speedY = baseSpeed + (ball.type === 'FAST' ? 3 : 1);
+        ball.speedX = (Math.random() - 0.5) * 1.2;
+    } else {
+        ball.type = 'SPINNER';
+        ball.speedY = baseSpeed;
+        ball.speedX = (Math.random() - 0.5) * 3.0; // High spin turn
+    }
+
+    ball.isBowled = true;
+    ball.isHit = false;
+    message = `BALL ${ballsBowled + 1}/${TOTAL_BALLS} [${bowlerType} - ${ball.type}]`;
+}
+
+function triggerPowerShot() {
+    if (powerBar >= 100 && ball.isBowled && !ball.isHit) {
+        powerBar = 0;
+        swingBat(true);
+    }
+}
+
+function addParticles(x, y, count, color) {
+    for (let i = 0; i < count; i++) {
+        particles.push({
+            x: x, y: y,
+            vx: (Math.random() - 0.5) * 6,
+            vy: (Math.random() - 0.5) * 6,
+            life: 20,
+            color: color
+        });
+    }
+}
+
+function swingBat(isPowerShot = false) {
+    if (!ball.isBowled || ball.isHit) return;
+
+    player.isSwinging = true;
+    player.swingTimer = 8;
+
+    let distY = Math.abs(ball.y - player.y);
+    let distX = Math.abs(ball.x - player.x);
+
+    if (distY < 32 && distX < 28) {
+        ball.isHit = true;
+        ballsBowled++;
+        
+        let runs = 0;
+        let hitDirection = (ball.x - player.x) * 0.4;
+
+        if (keys.Up) hitDirection *= 1.5; // Lofted shot angle
+        if (keys.Down) hitDirection *= 0.5; // Grounded control
+
+        if (distY < 10 || isPowerShot) {
+            runs = 6;
+            feedbackText = isPowerShot ? "⚡ POWER SIX! ⚡" : (keys.Up ? "🚀 LOFTED SIX!" : "🔥 PERFECT SIX!");
+            message = "💥 HUGE SIX! 💥";
+            playHitSound(true);
+            playCheerSound();
+            ball.speedY = -11;
+            ball.speedX = hitDirection * 3;
+            screenShakeTimer = 10;
+            crowdFlashTimer = 12;
+            addParticles(ball.x, ball.y, 15, '#00ffcc');
+            powerBar = Math.min(100, powerBar + 35);
+        } else if (distY < 20) {
+            runs = 4;
+            feedbackText = keys.Down ? "🏏 GROUNDED DRIVE FOUR!" : "⚡ CRACKING FOUR!";
+            message = "⚡ BOUNDARY FOUR! ⚡";
+            playHitSound(true);
+            playCheerSound();
+            ball.speedY = keys.Down ? -5 : -8;
+            ball.speedX = hitDirection * 4;
+            addParticles(ball.x, ball.y, 10, '#ffcc00');
+            powerBar = Math.min(100, powerBar + 20);
+        } else {
+            runs = Math.floor(Math.random() * 2) + 1;
+            feedbackText = "⚡ SINGLE / DOUBLE";
+            message = `RUNS SCORED: ${runs}`;
+            playHitSound(false);
+            ball.speedY = -5;
+            ball.speedX = hitDirection * 2;
+            powerBar = Math.min(100, powerBar + 10);
+        }
+        
+        feedbackTimer = 30;
+        score += runs;
+
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('pixel_cricket_high_score', highScore);
+            document.getElementById('high-score-val').innerText = highScore;
+        }
+
+        updateUI();
+        checkInningsStatus();
+        if (gameState === 'PLAYING') setTimeout(bowlBall, 1800);
+    }
+}
+
+function checkInningsStatus() {
+    if (gameMode === 'SOLO') {
+        if (score >= targetRuns) {
+            gameState = 'GAMEOVER';
+            matchResult = "🏆 VICTORY! TARGET CHASED!";
+            message = "PRESS SPACE TO PLAY AGAIN";
+        } else if (ballsBowled >= TOTAL_BALLS || wickets >= 3) {
+            gameState = 'GAMEOVER';
+            matchResult = `💔 DEFEAT! FELL SHORT BY ${targetRuns - score} RUNS`;
+            message = "PRESS SPACE TO RETRY";
+        }
+    } else if (gameMode === 'CUP') {
+        if (score >= targetRuns) {
+            if (cupStage < 3) {
+                cupStage++;
+                let nextStage = cupStage === 2 ? "SEMI-FINAL" : "WORLD CUP FINAL";
+                matchResult = `🎉 STAGE CLEARED! ADVANCING TO ${nextStage}!`;
+                message = "PRESS SPACE FOR NEXT MATCH";
+                gameState = 'GAMEOVER';
+            } else {
+                gameState = 'GAMEOVER';
+                matchResult = "🏆 WORLD CUP CHAMPION! YOU WON THE TROPHY!";
+                message = "PRESS SPACE TO RESTART CHAMPIONSHIP";
+            }
+        } else if (ballsBowled >= TOTAL_BALLS || wickets >= 3) {
+            gameState = 'GAMEOVER';
+            matchResult = `💔 KNOCKED OUT IN STAGE ${cupStage}!`;
+            message = "PRESS SPACE TO RETRY CUP";
+        }
+    } else {
+        if (currentInnings === 1) {
+            if (ballsBowled >= TOTAL_BALLS || wickets >= 3) {
+                p1Score = score;
+                targetRuns = p1Score + 1;
+                currentInnings = 2;
+                score = 0;
+                wickets = 0;
+                ballsBowled = 0;
+                message = `PLAYER 2: CHASE ${targetRuns} RUNS TO WIN!`;
+                updateUI();
+            }
+        } else {
+            if (score >= targetRuns) {
+                gameState = 'GAMEOVER';
+                matchResult = "🏆 PLAYER 2 WINS THE MATCH!";
+                message = "PRESS SPACE FOR REMATCH";
+            } else if (ballsBowled >= TOTAL_BALLS || wickets >= 3) {
+                gameState = 'GAMEOVER';
+                if (score === p1Score) matchResult = "🤝 MATCH TIED!";
+                else matchResult = `🏆 PLAYER 1 WINS BY ${p1Score - score} RUNS!`;
+                message = "PRESS SPACE FOR REMATCH";
+            }
+        }
+    }
+}
+
+function updateUI() {
+    let modeText = gameMode;
+    if (gameMode === 'VS') modeText = `P${currentInnings}`;
+    if (gameMode === 'CUP') modeText = `CUP S${cupStage}`;
+
+    document.getElementById('innings-text').innerText = modeText;
+    document.getElementById('score-wickets').innerText = `${score}/${wickets}`;
+    document.getElementById('target').innerText = (gameMode === 'VS' && currentInnings === 1) ? 'SETTING' : targetRuns;
+    document.getElementById('balls-left').innerText = TOTAL_BALLS - ballsBowled;
+    document.getElementById('power-bar-fill').style.width = powerBar + '%';
+}
+
+function update() {
+    if (gameState !== 'PLAYING') return;
+
+    if (keys.Left && player.x > player.minX) player.x -= player.speed;
+    if (keys.Right && player.x < player.maxX) player.x += player.speed;
+
+    if (player.isSwinging) {
+        player.swingTimer--;
+        if (player.swingTimer <= 0) player.isSwinging = false;
+    }
+
+    if (feedbackTimer > 0) feedbackTimer--;
+    if (screenShakeTimer > 0) screenShakeTimer--;
+    if (crowdFlashTimer > 0) crowdFlashTimer--;
+
+    // Update Particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life--;
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+
+    if (ball.isBowled) {
+        ball.y += ball.speedY;
+        ball.x += ball.speedX;
+
+        if (!ball.isHit) {
+            if (ball.x < 135) { ball.x = 135; ball.speedX = Math.abs(ball.speedX); }
+            else if (ball.x > 265) { ball.x = 265; ball.speedX = -Math.abs(ball.speedX); }
+        }
+
+        if (!ball.isHit && ball.y > 545) {
+            ball.isBowled = false;
+            wickets++;
+            ballsBowled++;
+            message = "🔴 OUT! BOWLED!";
+            feedbackText = "❌ MISSED!";
+            feedbackTimer = 30;
+            playWicketSound();
+            updateUI();
+            checkInningsStatus();
+
+            if (gameState === 'PLAYING') setTimeout(bowlBall, 1800);
+        }
+    }
+}
+
+function drawPixelBatsman(x, y, swinging) {
+    ctx.fillStyle = '#1e90ff'; ctx.fillRect(x - 8, y, 16, 18);
+    ctx.fillStyle = '#000080'; ctx.fillRect(x - 6, y - 10, 12, 10);
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(x - 8, y + 18, 6, 12); ctx.fillRect(x + 2, y + 18, 6, 12);
+    ctx.fillStyle = swinging ? '#ff6347' : '#d2691e';
+    if (swinging) ctx.fillRect(x - 22, y + 2, 28, 8);
+    else ctx.fillRect(x + 8, y - 8, 6, 26);
+}
+
+function drawPixelBowler(x, y) {
+    ctx.fillStyle = bowlerType === 'SPINNER' ? '#ff00ff' : '#ffd700'; ctx.fillRect(x - 6, y, 12, 16);
+    ctx.fillStyle = '#8b4513'; ctx.fillRect(x - 5, y - 8, 10, 8);
+    ctx.fillStyle = '#ffd700'; ctx.fillRect(x - 6, y + 16, 12, 10);
+}
+
+function draw() {
+    ctx.save();
+
+    if (screenShakeTimer > 0) {
+        ctx.translate((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6);
+    }
+
+    // Dynamic pitch color based on pitch type
+    let grassColor = crowdFlashTimer > 0 ? '#00ffcc' : '#228b22';
+    let pitchColor = pitchType === 'GREEN' ? '#8ab36b' : (pitchType === 'DUSTY' ? '#e0c088' : '#d2b48c');
+
+    ctx.fillStyle = grassColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgba(0,0,0,0.1)';
+    for (let i = 0; i < canvas.height; i += 40) ctx.fillRect(0, i, canvas.width, 20);
+
+    ctx.fillStyle = pitchColor; ctx.fillRect(130, 60, 140, 480);
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(130, 510, 140, 4); ctx.fillRect(130, 120, 140, 4);
+
+    ctx.fillRect(193, 110, 3, 10); ctx.fillRect(199, 110, 3, 10); ctx.fillRect(205, 110, 3, 10);
+    ctx.fillRect(193, 530, 3, 14); ctx.fillRect(199, 530, 3, 14); ctx.fillRect(205, 530, 3, 14);
+
+    drawPixelBowler(bowler.x, bowler.y);
+    drawPixelBatsman(player.x, player.y, player.isSwinging);
+
+    // Particles
+    for (let p of particles) {
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, 4, 4);
+    }
+
+    if (ball.isBowled) {
+        ctx.fillStyle = ball.type === 'FAST' ? '#ff0000' : (ball.type === 'SPINNER' ? '#ff00ff' : '#ff1493');
+        ctx.fillRect(ball.x - 4, ball.y - 4, 8, 8);
+    }
+
+    if (gameState === 'PLAYING' || gameState === 'GAMEOVER') {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillRect(15, 10, 370, 35);
+        ctx.fillStyle = '#00ffcc';
+        ctx.font = 'bold 11px "Courier New", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(message, canvas.width / 2, 32);
+    }
+
+    if (feedbackTimer > 0) {
+        ctx.fillStyle = '#ffcc00';
+        ctx.font = 'bold 13px "Courier New", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(feedbackText, canvas.width / 2, 480);
+    }
+
+    if (gameState === 'GAMEOVER') {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.88)';
+        ctx.fillRect(20, 200, 360, 160);
+        
+        ctx.fillStyle = '#00ffcc';
+        ctx.font = 'bold 13px "Courier New", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(matchResult, canvas.width / 2, 250);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '11px "Courier New", monospace';
+        ctx.fillText(message, canvas.width / 2, 300);
+    }
+
+    ctx.restore();
+}
+
+function gameLoop() {
+    update();
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+
+</body>
+</html>
