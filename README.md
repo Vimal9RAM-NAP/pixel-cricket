@@ -1,43 +1,39 @@
 # 🏏 Pixel Cricket v1 — Ultimate Arcade Edition
 
-![Version](https://img.shields.io/badge/version-1.0.0-00ffcc?style=flat-square)
-![License](https://img.shields.io/badge/license-MIT-ff0055?style=flat-square)
-![Stack](https://img.shields.io/badge/tech-HTML5%20%7C%20Canvas%20%7C%20JS-ffcc00?style=flat-square)
+A lightweight, arcade-style pixel cricket game built completely from scratch using pure **HTML5 Canvas, CSS, and Vanilla JavaScript**. Play in your desktop browser using physical keyboard controls or on mobile devices via responsive touch inputs!
 
-An arcade-inspired single-file retro cricket game built using HTML5 Canvas, CSS Flexbox, and vanilla JavaScript. Features custom Web Audio API chiptunes, dynamic pitch conditions, and a real-time match dashboard.
-
----
-
-## 📸 Visuals & Screenshots
-
-|             Title Screen / Main Menu             |                Gameplay & Match Dashboard                |
-| :----------------------------------------------: | :------------------------------------------------------: |
-| ![Pixel Cricket Menu](docs/screenshots/menu.png) | ![Pixel Cricket Gameplay](docs/screenshots/gameplay.png) |
+[![Play Game](https://img.shields.io/badge/Play_Now-GitHub_Pages-00ffcc?style=for-the-badge&logo=github)](https://vimal9ram-nap.github.io/pixel-cricket/)
+[![Itch.io](https://img.shields.io/badge/Play_On-Itch.io-ff0055?style=for-the-badge&logo=itch.io)](https://itch.io)
 
 ---
 
-## ✨ Features & Game Mechanics
+## ✨ Features
 
-- **🌱 Dynamic Pitch Conditions:** Experience varying ball bounce speeds and drift with **Green Seam**, **Dusty Spin**, and **Standard** pitch types.
-- **🎯 Directional Shot Control:** Combine key inputs to execute lofted power hits or controlled grounded drives.
-- **🏆 Multiple Game Modes:**
-  - **SOLO:** Chase procedurally generated target runs in a 6-ball over.
-  - **2P VS:** Local two-player head-to-head match setup.
-  - **WORLD CUP:** Multi-stage tournament mode (Quarter-Final, Semi-Final, Final) with escalating difficulty.
-- **⚡ Power Meter System:** Fill your power gauge through precise timing to unlock high-velocity Super Power Shots.
-- **🎵 Chiptune Audio & Particle FX:** Synthesized retro audio created via Web Audio API, accompanied by boundary trail particles and screen shake effects.
+- **🕹️ Pure Vanilla Tech Stack:** Built without any external game engines or third-party libraries.
+- **📱 Mobile & Desktop Cross-Play:** Fully responsive design featuring on-screen touch buttons for mobile browsers and keyboard shortcut bindings for desktop.
+- **🎯 Directional Shot Control:** Select your shot height and angle in real time:
+  - **Lofted Shot:** High risk, high reward over the boundary rope.
+  - **Grounded Drive:** Safe, low-trajectory shot into open gaps.
+  - **Super Power Shot:** Devastating high-velocity strike when the power meter hits 100%.
+- **⚡ Dynamic Power Meter:** Automatically charges over time to allow special power swings.
+- **📊 Live Match HUD:** Tracks total runs, ball count, shot selection, and power gauge percentage.
 
 ---
 
-## 🎮 Controls
+## 🎮 How to Play
 
-| Key / Input               | Action                                               |
-| :------------------------ | :--------------------------------------------------- |
-| <kbd>◀</kbd> <kbd>▶</kbd> | Move batsman along the crease                        |
-| <kbd>▲</kbd>              | Position for a **Lofted Power Shot**                 |
-| <kbd>▼</kbd>              | Position for a **Grounded Defensive Drive**          |
-| <kbd>Spacebar</kbd>       | Swing bat                                            |
-| <kbd>P</kbd>              | Trigger **Super Power Shot** _(Requires Full Meter)_ |
+### 💻 Desktop Controls
+
+- <kbd>▲ Up Arrow</kbd> — Select **Lofted** shot
+- <kbd>▼ Down Arrow</kbd> — Select **Grounded** shot
+- <kbd>Spacebar</kbd> — Swing bat / Play delivery
+- <kbd>P</kbd> — Trigger **Super Power Shot** _(requires 100% power meter)_
+
+### 📱 Mobile Controls
+
+- Tap **▲ Lofted** / **▼ Grounded** on-screen buttons to adjust shot type.
+- Tap **⚡ POWER** to trigger a super power shot.
+- **Direct Screen Tap:** Tap anywhere on the game canvas to swing immediately!
 
 ---
 
@@ -45,11 +41,9 @@ An arcade-inspired single-file retro cricket game built using HTML5 Canvas, CSS 
 
 ```text
 pixel-cricket/
-├── index.html            # Core game engine, UI layout, and audio logic
-├── README.md             # Project documentation
-├── LICENSE               # MIT License
-└── docs/
-    └── screenshots/      # Screenshots for repo display
-        ├── menu.png
-        └── gameplay.png
+├── docs/
+│   └── screenshots/     # Showcase images and GIFs
+├── index.html           # Full application logic (HTML, CSS & JS)
+├── LICENSE              # Open-source license (MIT)
+└── README.md            # Project documentation
 ```
