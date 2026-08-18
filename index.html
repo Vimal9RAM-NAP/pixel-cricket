@@ -257,6 +257,28 @@
       text-shadow: 0 0 10px rgba(0, 255, 204, 0.8);
     }
 
+    .mode-selector {
+      display: flex;
+      gap: 6px;
+      margin: 4px 0;
+    }
+
+    .mode-opt {
+      padding: 5px 10px;
+      background: #10121a;
+      border: 1px solid #333;
+      color: #888;
+      font-size: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .mode-opt.active {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      background: #1a2233;
+    }
+
     .menu-btn {
       width: 210px;
       padding: 9px;
@@ -319,7 +341,14 @@
       <div id="menuOverlay" class="overlay-screen">
         <div class="overlay-title">PIXEL CRICKET</div>
         <div style="color: var(--accent-yellow); font-size: 11px;">v1.0 Ultimate Arcade Edition</div>
-        <div style="color: #aaa; font-size: 10px; margin-bottom: 5px;">Created by Odd Jobs Dev (Vimal Ram)</div>
+        <div style="color: #aaa; font-size: 10px;">Created by Odd Jobs Dev (Vimal Ram)</div>
+
+        <div style="font-size: 10px; color: var(--accent-cyan); margin-top: 4px;">SELECT GAME MODE:</div>
+        <div class="mode-selector">
+          <div class="mode-opt active" id="mode-solo" onclick="selectMode('SOLO', event)">SOLO</div>
+          <div class="mode-opt" id="mode-2p" onclick="selectMode('2P VS', event)">2P VS</div>
+          <div class="mode-opt" id="mode-cup" onclick="selectMode('🏆 WORLD CUP', event)">🏆 WORLD CUP</div>
+        </div>
 
         <button class="menu-btn primary" onclick="startGame()">► START MATCH</button>
         <button class="menu-btn" onclick="shareGame()">🔗 SHARE GAME</button>
@@ -332,10 +361,11 @@
         <div class="modal-box">
           <div style="color: var(--accent-pink); font-size: 14px; font-weight: bold; margin-bottom: 10px;">🎮 HOW TO PLAY</div>
           <div style="font-size: 11px; text-align: left; line-height: 1.6; color: #ccc;">
+            • <b>Modes:</b> SOLO, 2P VS (Take Turns), WORLD CUP Tournament.<br>
             • <b>Desktop:</b> Arrow Left/Right to position batsman. Spacebar to Swing.<br>
             • <b>Mobile:</b> Touch & drag left/right on pitch to position batsman. Tap pitch to Swing.<br>
-            • <b>Loft/Ground:</b> Use Arrow Up/Down or tap the screen buttons.<br>
-            • <b>Power Shot:</b> Fills automatically! When meter reaches 100%, next Spacebar / Tap releases a Power Shot!
+            • <b>Loft/Ground:</b> Use Arrow Up/Down or tap screen buttons.<br>
+            • <b>Power Shot:</b> Auto-triggers on Space/Tap when meter reaches 100%!
           </div>
           <button class="guide-btn" onclick="closeGuideModal()" style="margin-top: 15px;">CLOSE</button>
         </div>
@@ -353,7 +383,7 @@
           </div>
           <div class="dash-card">
             <div class="dash-label">TARGET</div>
-            <div id="ui-target" class="dash-value alt">32</div>
+            <div id="ui-target" class="dash-value alt">--</div>
           </div>
           <div class="dash-card">
             <div class="dash-label">SCORE</div>
@@ -422,14 +452,27 @@
     osc.stop(audioCtx.currentTime + duration);
   }
 
+  // Preset Configurations
+  const PITCH_TYPES = [
+    { name: 'DUSTY', color: '#d2b48c' },
+    { name: 'GREEN', color: '#88ab67' },
+    { name: 'HARD', color: '#c4a482' },
+    { name: 'DRY', color: '#e3c896' }
+  ];
+
+  const BOWLER_TYPES = ['FAST', 'SWING', 'SPINNER', 'MEDIUM PACE'];
+
   // Game States
+  let selectedMode = 'SOLO';
   let isPlaying = false;
   let runsScored = 0;
   let wickets = 0;
   let ballsRemaining = 6;
-  let targetRuns = 32;
+  let targetRuns = 28;
   let powerMeter = 35;
   let shotType = 'NORMAL';
+  let currentPitch = PITCH_TYPES[0];
+  let currentBowler = 'SPINNER';
   let bannerText = "RUNS SCORED: 0";
   let popupCommentary = "";
   let popupTimer = 0;
@@ -438,6 +481,22 @@
   let batsman = { x: 180, y: 440, swingAnim: 0 };
   let bowler = { x: 180, y: 130, armAnim: 0 };
   let ball = { x: 190, y: 150, vx: 0, vy: 0, active: false };
+
+  function selectMode(mode, event) {
+    selectedMode = mode;
+    document.querySelectorAll('.mode-opt').forEach(el => el.classList.remove('active'));
+    if (event && event.target) event.target.classList.add('active');
+    document.getElementById('ui-mode').innerText = mode;
+  }
+
+  function generateRandomTarget() {
+    return Math.floor(Math.random() * (32 - 25 + 1)) + 25;
+  }
+
+  function randomizePitchAndBowler() {
+    currentPitch = PITCH_TYPES[Math.floor(Math.random() * PITCH_TYPES.length)];
+    currentBowler = BOWLER_TYPES[Math.floor(Math.random() * BOWLER_TYPES.length)];
+  }
 
   // Prevent Page Scroll when pressing Arrow Keys or Space
   window.addEventListener('keydown', (e) => {
@@ -456,11 +515,7 @@
   });
 
   // Mobile Pitch Touch Gesture Handling
-  let touchStartX = 0;
   canvas.addEventListener('touchstart', (e) => {
-    const touch = e.touches[0];
-    const rect = canvas.getBoundingClientRect();
-    touchStartX = touch.clientX - rect.left;
     executeSwing();
   }, { passive: true });
 
@@ -487,7 +542,9 @@
     wickets = 0;
     ballsRemaining = 6;
     powerMeter = 35;
-    bannerText = "MATCH STARTED!";
+    targetRuns = generateRandomTarget();
+    randomizePitchAndBowler();
+    bannerText = `${selectedMode} MATCH STARTED!`;
     document.getElementById('menuOverlay').style.display = 'none';
     updateUI();
     resetBall();
@@ -497,14 +554,30 @@
     document.getElementById('ui-score').innerText = `${runsScored}/${wickets}`;
     document.getElementById('ui-balls').innerText = ballsRemaining;
     document.getElementById('ui-target').innerText = targetRuns;
+    document.getElementById('ui-pitch').innerText = currentPitch.name;
+    document.getElementById('ui-bowler').innerText = currentBowler;
     document.getElementById('ui-meter').style.width = `${powerMeter}%`;
   }
 
   function resetBall() {
     ball.x = 185 + (Math.random() * 10 - 5);
     ball.y = 150;
-    ball.vx = (Math.random() - 0.5) * 1.5;
-    ball.vy = 3.5 + Math.random() * 1.5;
+
+    // Apply speed and movement mechanics based on Bowler Type
+    if (currentBowler === 'FAST') {
+      ball.vx = (Math.random() - 0.5) * 1.2;
+      ball.vy = 5.2 + Math.random() * 1.5;
+    } else if (currentBowler === 'SWING') {
+      ball.vx = (Math.random() - 0.5) * 3.0;
+      ball.vy = 3.8 + Math.random() * 1.0;
+    } else if (currentBowler === 'SPINNER') {
+      ball.vx = (Math.random() - 0.5) * 1.8;
+      ball.vy = 3.0 + Math.random() * 1.0;
+    } else { // MEDIUM PACE
+      ball.vx = (Math.random() - 0.5) * 1.5;
+      ball.vy = 4.0 + Math.random() * 1.0;
+    }
+
     ball.active = true;
     bowler.armAnim = 10;
   }
@@ -525,7 +598,6 @@
       playSound(520, 0.15, 'triangle');
       let hitRuns = 0;
 
-      // Auto Power Shot Execution
       if (powerMeter >= 100) {
         hitRuns = 6;
         powerMeter = 0;
@@ -560,7 +632,7 @@
       isPlaying = false;
       setTimeout(() => {
         if (runsScored >= targetRuns) playSound(880, 0.4, 'sine');
-        alert(runsScored >= targetRuns ? '🎉 YOU WON THE MATCH!' : '❌ MATCH OVER - TARGET MISSED');
+        alert(runsScored >= targetRuns ? `🎉 YOU WON THE ${selectedMode} MATCH!` : `❌ MATCH OVER - TARGET (${targetRuns}) MISSED`);
         document.getElementById('menuOverlay').style.display = 'flex';
       }, 500);
     }
@@ -592,7 +664,6 @@
   }
 
   function render() {
-    // Clear entire canvas to prevent white artifacts/trails
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Grass Background & Stripes
@@ -603,8 +674,8 @@
       if ((i / 40) % 2 === 0) ctx.fillRect(0, i, canvas.width, 40);
     }
 
-    // Dirt pitch
-    ctx.fillStyle = '#d2b48c';
+    // Dynamic Pitch Color
+    ctx.fillStyle = currentPitch.color;
     ctx.fillRect(130, 80, 120, 380);
 
     // Crease lines
