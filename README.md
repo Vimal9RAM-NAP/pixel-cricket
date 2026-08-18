@@ -49,35 +49,43 @@ A fast-paced, retro-styled browser cricket game built with HTML5 Canvas and Vani
 
 ## 🚀 How to Run
 
-```bash
-# 1. Clone the repository
-git clone [https://github.com/Vimal9RAM-NAP/pixel-cricket.git](https://github.com/Vimal9RAM-NAP/pixel-cricket.git)
+1. **Clone the repository:**
+   `git clone https://github.com/Vimal9RAM-NAP/pixel-cricket.git`
+2. **Navigate into the directory:**
+   `cd pixel-cricket`
+3. **Launch the game:**
+   Open `index.html` in any web browser or use VS Code's **Live Server** extension.
 
-# 2. Navigate into the directory
-cd pixel-cricket
+---
 
-# 3. Open in browser (or open index.html directly / use VS Code Live Server)
-code .
-📁 Repository Structure
-pixel-cricket/
-├── docs/
-│   └── screenshots/
-│       ├── gameplay.png       # Gameplay screenshot
-│       └── menu.png           # Main menu screenshot
-├── index.html                 # Main game code (Canvas, CSS, JS)
-├── LICENSE                    # MIT License
-└── README.md                  # Project Documentation
-🛠️ Built With
+## 📁 Repository Structure
 
-    HTML5 Canvas — 2D graphics rendering and animation loop
+- **pixel-cricket/**
+  - **docs/**
+    - **screenshots/**
+      - `gameplay.png` — Gameplay screenshot
+      - `menu.png` — Main menu screenshot
+  - `index.html` — Main game code (Canvas, CSS, JS)
+  - `LICENSE` — MIT License
+  - `README.md` — Project Documentation
 
-    Vanilla JavaScript (ES6+) — Game logic, collision detection, and physics
+---
 
-    Web Audio API — Real-time retro sound effect synthesis
+## 🛠️ Built With
 
-    CSS3 — Custom retro arcade UI layout
+- **HTML5 Canvas** — 2D graphics rendering and animation loop
+- **Vanilla JavaScript (ES6+)** — Game logic, collision detection, and physics
+- **Web Audio API** — Real-time retro sound effect synthesis
+- **CSS3** — Custom retro arcade UI layout
 
-📄 License
+---
 
-Distributed under the MIT License. See LICENSE for more information.
-```
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+<p align="center">
+  Developed by <b>Odd Jobs Dev (Vimal Ram)</b>
+</p>
