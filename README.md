@@ -3,6 +3,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Language: HTML/JS](https://img.shields.io/badge/Made%20With-HTML5%20%26%20JS-blue)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Platform: Web](https://img.shields.io/badge/Platform-Browser%20%7C%20Mobile-brightgreen)](https://github.com/Vimal9RAM-NAP/pixel-cricket)
+[![Pixel Cricket on itch.io](https://img.shields.io/badge/Play%20Pixel%20Cricket-itch.io-FA5C5C?style=for-the-badge&logo=itch.io&logoColor=white)](https://itch.io/embed-upload/18859789?color=333333)
+
+<a href="https://itch.io/embed-upload/18859789?color=333333">
+  <img src="https://img.shields.io/badge/Status-Playable%20in%20Browser-00ffff?style=flat-square" alt="Playable Status" />
+</a>
 
 A fast-paced, retro-styled browser cricket game built with HTML5 Canvas and Vanilla JavaScript. Features interactive bowling mechanics, customizable match modes, dynamic pitch types, synthesized retro audio, and full touch/keyboard controls.
 
