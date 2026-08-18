@@ -298,7 +298,7 @@
     }
 
     /* Modal Styling */
-    #guideModal {
+    #guideModal, #resultOverlay {
       display: none;
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -314,10 +314,28 @@
     .modal-box {
       background: var(--card-bg);
       border: 2px solid var(--accent-cyan);
-      padding: 15px;
+      padding: 18px;
       max-width: 320px;
       width: 100%;
+      text-align: center;
       box-shadow: 4px 4px 0px var(--accent-pink);
+    }
+
+    .result-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    .result-stats {
+      font-size: 11px;
+      line-height: 1.8;
+      color: #ccc;
+      margin: 12px 0;
+      background: #0d0e15;
+      padding: 10px;
+      border: 1px solid #2a2f45;
     }
   </style>
 </head>
@@ -354,6 +372,24 @@
         <button class="menu-btn" onclick="shareGame()">🔗 SHARE GAME</button>
         <button class="menu-btn" style="background:#ff0055; color:#fff;" onclick="openGuideModal()">? GAME GUIDE</button>
         <button class="menu-btn" style="background:#ffcc00; color:#000;" onclick="rateItch()">⭐ RATE ON ITCH.IO</button>
+      </div>
+
+      <!-- Match End Result Overlay -->
+      <div id="resultOverlay">
+        <div class="modal-box" id="resultBox">
+          <div id="resTitle" class="result-title">MATCH OVER</div>
+          <div id="resSubtitle" style="font-size: 11px; color: var(--accent-yellow);">MATCH SUMMARY</div>
+          
+          <div class="result-stats">
+            <div>MODE: <span id="resMode" style="color:#00ffcc;">SOLO</span></div>
+            <div>SCORE: <span id="resScore" style="color:#ffcc00;">0/0</span></div>
+            <div>TARGET: <span id="resTarget" style="color:#00ffcc;">0</span></div>
+            <div>STATUS: <span id="resStatus">--</span></div>
+          </div>
+
+          <button class="menu-btn primary" onclick="restartMatch()" style="width: 100%; margin-bottom: 6px;">► PLAY AGAIN</button>
+          <button class="menu-btn" onclick="returnToMenu()" style="width: 100%;">⚙ MAIN MENU</button>
+        </div>
       </div>
 
       <!-- Detailed Guide Modal -->
@@ -452,7 +488,6 @@
     osc.stop(audioCtx.currentTime + duration);
   }
 
-  // Preset Configurations
   const PITCH_TYPES = [
     { name: 'DUSTY', color: '#d2b48c' },
     { name: 'GREEN', color: '#88ab67' },
@@ -462,7 +497,6 @@
 
   const BOWLER_TYPES = ['FAST', 'SWING', 'SPINNER', 'MEDIUM PACE'];
 
-  // Game States
   let selectedMode = 'SOLO';
   let isPlaying = false;
   let runsScored = 0;
@@ -498,7 +532,6 @@
     currentBowler = BOWLER_TYPES[Math.floor(Math.random() * BOWLER_TYPES.length)];
   }
 
-  // Prevent Page Scroll when pressing Arrow Keys or Space
   window.addEventListener('keydown', (e) => {
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
       e.preventDefault();
@@ -514,7 +547,6 @@
     keys[e.code] = false;
   });
 
-  // Mobile Pitch Touch Gesture Handling
   canvas.addEventListener('touchstart', (e) => {
     executeSwing();
   }, { passive: true });
@@ -546,6 +578,7 @@
     randomizePitchAndBowler();
     bannerText = `${selectedMode} MATCH STARTED!`;
     document.getElementById('menuOverlay').style.display = 'none';
+    document.getElementById('resultOverlay').style.display = 'none';
     updateUI();
     resetBall();
   }
@@ -563,7 +596,6 @@
     ball.x = 185 + (Math.random() * 10 - 5);
     ball.y = 150;
 
-    // Apply speed and movement mechanics based on Bowler Type
     if (currentBowler === 'FAST') {
       ball.vx = (Math.random() - 0.5) * 1.2;
       ball.vy = 5.2 + Math.random() * 1.5;
@@ -573,7 +605,7 @@
     } else if (currentBowler === 'SPINNER') {
       ball.vx = (Math.random() - 0.5) * 1.8;
       ball.vy = 3.0 + Math.random() * 1.0;
-    } else { // MEDIUM PACE
+    } else {
       ball.vx = (Math.random() - 0.5) * 1.5;
       ball.vy = 4.0 + Math.random() * 1.0;
     }
@@ -631,11 +663,47 @@
     if (ballsRemaining <= 0 || runsScored >= targetRuns) {
       isPlaying = false;
       setTimeout(() => {
-        if (runsScored >= targetRuns) playSound(880, 0.4, 'sine');
-        alert(runsScored >= targetRuns ? `🎉 YOU WON THE ${selectedMode} MATCH!` : `❌ MATCH OVER - TARGET (${targetRuns}) MISSED`);
-        document.getElementById('menuOverlay').style.display = 'flex';
+        showMatchEndOverlay(runsScored >= targetRuns);
       }, 500);
     }
+  }
+
+  function showMatchEndOverlay(won) {
+    const resTitle = document.getElementById('resTitle');
+    const resSubtitle = document.getElementById('resSubtitle');
+    const resStatus = document.getElementById('resStatus');
+
+    document.getElementById('resMode').innerText = selectedMode;
+    document.getElementById('resScore').innerText = `${runsScored}/${wickets}`;
+    document.getElementById('resTarget').innerText = targetRuns;
+
+    if (won) {
+      playSound(660, 0.2, 'sine');
+      setTimeout(() => playSound(880, 0.4, 'sine'), 200);
+      resTitle.innerText = "🏆 MATCH VICTORY!";
+      resTitle.style.color = "#00ffcc";
+      resSubtitle.innerText = "CONGRATULATIONS!";
+      resStatus.innerText = "TARGET ACHIEVED 🎉";
+      resStatus.style.color = "#00ffcc";
+    } else {
+      playSound(150, 0.4, 'sawtooth');
+      resTitle.innerText = "❌ MATCH OVER";
+      resTitle.style.color = "#ff0055";
+      resSubtitle.innerText = "BETTER LUCK NEXT TIME!";
+      resStatus.innerText = "TARGET MISSED";
+      resStatus.style.color = "#ff0055";
+    }
+
+    document.getElementById('resultOverlay').style.display = 'flex';
+  }
+
+  function restartMatch() {
+    startGame();
+  }
+
+  function returnToMenu() {
+    document.getElementById('resultOverlay').style.display = 'none';
+    document.getElementById('menuOverlay').style.display = 'flex';
   }
 
   function update() {
