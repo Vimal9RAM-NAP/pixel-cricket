@@ -1,341 +1,668 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Pixel Cricket v1 - Ultimate Arcade Edition</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-    }
-    
-    body {
-      background-color: #0d0e15;
-      color: #fff;
-      font-family: 'Courier New', Courier, monospace;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 10px;
-      touch-action: none; /* Prevents mobile swipe-refresh and scrolling */
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PIXEL CRICKET V1</title>
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --container-bg: #1f2833;
+            --accent-cyan: #00ffcc;
+            --accent-pink: #ff0055;
+            --accent-yellow: #ffcc00;
+            --text-color: #c5c6c7;
+            --card-bg: #151a21;
+        }
 
-    #game-container {
-      position: relative;
-      text-align: center;
-      border: 4px solid #333;
-      padding: 15px;
-      background: #141622;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-      max-width: 730px;
-      width: 100%;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
 
-    .header-title {
-      margin: 0 0 10px 0;
-      color: #00ffcc;
-      font-size: 20px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 10px;
+            touch-action: manipulation;
+        }
 
-    canvas {
-      background: #222;
-      border: 2px solid #00ffcc;
-      width: 100%;
-      height: auto;
-      max-height: 400px;
-      display: block;
-      margin: 0 auto;
-      touch-action: none;
-    }
+        #game-wrapper {
+            background: #141622;
+            border: 4px solid var(--accent-pink);
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.3), inset 0 0 15px rgba(0, 255, 204, 0.2);
+            padding: 15px;
+            max-width: 950px;
+            width: 100%;
+            border-radius: 4px;
+        }
 
-    /* Mobile Controls Styling */
-    #mobile-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      margin-top: 15px;
-      gap: 10px;
-    }
+        .main-header {
+            text-align: center;
+            color: var(--accent-cyan);
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 0 8px rgba(0, 255, 204, 0.6);
+            letter-spacing: 2px;
+        }
 
-    .control-group {
-      display: flex;
-      gap: 10px;
-      flex: 1;
-    }
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 15px;
+        }
 
-    .touch-btn {
-      background: #1e2238;
-      color: #00ffcc;
-      border: 2px solid #00ffcc;
-      padding: 14px 10px;
-      font-family: 'Courier New', monospace;
-      font-weight: bold;
-      font-size: 15px;
-      border-radius: 8px;
-      flex: 1;
-      text-align: center;
-      cursor: pointer;
-      box-shadow: 0 4px 0 #009977;
-      transition: transform 0.05s, background 0.05s;
-    }
+        @media (max-width: 800px) {
+            .layout-grid {
+                grid-template-columns: 1fr;
+            }
+        }
 
-    .touch-btn:active, .touch-btn.active {
-      transform: translateY(4px);
-      box-shadow: none;
-      background: #00ffcc;
-      color: #000;
-    }
+        .canvas-container {
+            position: relative;
+            background: #0d0e15;
+            border: 2px solid var(--accent-cyan);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 500px;
+        }
 
-    .power-btn {
-      background: #3a0d25;
-      color: #ff0055;
-      border-color: #ff0055;
-      box-shadow: 0 4px 0 #990033;
-    }
+        canvas {
+            display: block;
+            background: #2e7d32;
+            max-width: 100%;
+            height: auto;
+        }
 
-    .power-btn:active, .power-btn.active {
-      background: #ff0055;
-      color: #fff;
-    }
+        /* Sidebar Panels */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-    #instructions {
-      margin-top: 10px;
-      font-size: 12px;
-      color: #aaa;
-    }
-  </style>
+        .panel {
+            background: var(--card-bg);
+            border: 2px solid var(--accent-pink);
+            box-shadow: 3px 3px 0px var(--accent-cyan);
+            padding: 12px;
+            border-radius: 2px;
+        }
+
+        .panel-title {
+            color: var(--accent-pink);
+            font-size: 13px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .panel-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 0, 85, 0.3);
+            margin-left: 6px;
+        }
+
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .dash-card {
+            background: #0d0e15;
+            border: 1px solid #2a2f45;
+            padding: 8px;
+            border-radius: 2px;
+        }
+
+        .dash-label {
+            font-size: 10px;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .dash-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent-cyan);
+            margin-top: 2px;
+        }
+
+        .dash-value.alt {
+            color: var(--accent-pink);
+        }
+
+        .dash-value.yellow {
+            color: var(--accent-yellow);
+        }
+
+        /* Power Meter */
+        .meter-container {
+            height: 16px;
+            background: #0d0e15;
+            border: 1px solid var(--accent-cyan);
+            padding: 2px;
+            margin-top: 6px;
+        }
+
+        .meter-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00ffcc, #ffcc00, #ff0055);
+            transition: width 0.1s linear;
+        }
+
+        .meter-subtext {
+            font-size: 10px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        /* Quick Controls Info Box */
+        .controls-info {
+            font-size: 11px;
+            line-height: 1.6;
+            color: #aaa;
+        }
+
+        .key-tag {
+            display: inline-block;
+            background: #10121a;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 1px 4px;
+            font-size: 10px;
+            border-radius: 2px;
+            margin: 0 2px;
+        }
+
+        .guide-btn {
+            width: 100%;
+            background: var(--accent-pink);
+            color: #fff;
+            border: none;
+            padding: 8px;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 8px;
+            box-shadow: 2px 2px 0px var(--accent-cyan);
+        }
+
+        .guide-btn:active {
+            transform: translate(1px, 1px);
+            box-shadow: none;
+        }
+
+        /* Overlay UI / Menu Screen */
+        .overlay-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 14, 21, 0.92);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .overlay-title {
+            color: var(--accent-cyan);
+            font-size: 26px;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.8);
+        }
+
+        .overlay-sub {
+            color: var(--accent-yellow);
+            font-size: 11px;
+        }
+
+        .menu-btn {
+            width: 220px;
+            padding: 10px;
+            background: #141622;
+            color: var(--accent-cyan);
+            border: 2px solid var(--accent-cyan);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px var(--accent-pink);
+            transition: all 0.1s;
+        }
+
+        .menu-btn:hover, .menu-btn:active {
+            background: var(--accent-cyan);
+            color: #0d0e15;
+            box-shadow: none;
+        }
+
+        .menu-btn.primary {
+            background: var(--accent-cyan);
+            color: #0d0e15;
+            box-shadow: 3px 3px 0px var(--accent-pink);
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 5px;
+        }
+
+        .mode-opt {
+            padding: 6px 12px;
+            background: #10121a;
+            border: 1px solid #333;
+            color: #888;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .mode-opt.active {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            background: #1a2233;
+        }
+
+        /* Mobile Controls Styling */
+        #mobile-touch-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            background: #0f111a;
+            border: 2px solid var(--accent-pink);
+            box-shadow: 3px 3px 0px var(--accent-cyan);
+            border-radius: 4px;
+        }
+
+        .touch-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .cyber-btn {
+            flex: 1;
+            padding: 12px 4px;
+            background: #141622;
+            color: var(--accent-cyan);
+            border: 1px solid var(--accent-cyan);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-shadow: 0 0 5px rgba(0, 255, 204, 0.5);
+            border-radius: 2px;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 2px 2px 0px var(--accent-pink);
+        }
+
+        .cyber-btn:active, .cyber-btn.active {
+            background: var(--accent-cyan);
+            color: #0d0e15;
+            text-shadow: none;
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+
+        .cyber-btn-action {
+            background: #1e1326;
+            color: var(--accent-pink);
+            border-color: var(--accent-pink);
+            box-shadow: 2px 2px 0px var(--accent-cyan);
+            text-shadow: 0 0 5px rgba(255, 0, 85, 0.5);
+        }
+
+        .cyber-btn-action:active, .cyber-btn-action.active {
+            background: var(--accent-pink);
+            color: #ffffff;
+            text-shadow: none;
+            transform: translate(2px, 2px);
+            box-shadow: none;
+        }
+    </style>
 </head>
 <body>
 
-  <div id="game-container">
-    <h1 class="header-title">Pixel Cricket v1</h1>
-    
-    <!-- Game Canvas -->
-    <canvas id="gameCanvas" width="700" height="400"></canvas>
+<div id="game-wrapper">
+    <div class="main-header">🏏 PIXEL CRICKET V1</div>
 
-    <!-- On-Screen Mobile Touch Controls -->
-    <div id="mobile-controls">
-      <div class="control-group">
-        <button id="btn-up" class="touch-btn">▲ Lofted</button>
-        <button id="btn-down" class="touch-btn">▼ Grounded</button>
-      </div>
-      <button id="btn-power" class="touch-btn power-btn">⚡ POWER</button>
+    <div class="layout-grid">
+        <!-- Main Canvas Pitch Display -->
+        <div class="canvas-container">
+            <canvas id="gameCanvas" width="400" height="580"></canvas>
+
+            <!-- Menu Screen Overlay -->
+            <div id="menuOverlay" class="overlay-screen">
+                <div class="overlay-title">PIXEL CRICKET</div>
+                <div class="overlay-sub">v1.0 Ultimate Arcade Edition</div>
+                <div class="overlay-sub" style="color:#aaa;">Created by Odd Jobs Dev (Vimal Ram)</div>
+
+                <div style="font-size: 11px; margin-top: 5px; color: var(--accent-cyan);">SELECT GAME MODE:</div>
+                <div class="mode-selector">
+                    <div class="mode-opt active" onclick="setMode('SOLO')">SOLO</div>
+                    <div class="mode-opt" onclick="setMode('2P')">2P VS</div>
+                    <div class="mode-opt" onclick="setMode('CUP')">🏆 WORLD CUP</div>
+                </div>
+
+                <button class="menu-btn primary" onclick="startGame()">► START GAME</button>
+                <button class="menu-btn" onclick="shareGame()">🔗 SHARE GAME</button>
+                <button class="menu-btn" style="background:#ff0055; color:#fff;" onclick="toggleGuide()">? GAME GUIDE</button>
+                <button class="menu-btn" style="background:#ffcc00; color:#000;" onclick="rateItch()">⭐ RATE ON ITCH.IO</button>
+
+                <div id="highScoreTxt" class="overlay-sub" style="margin-top: 5px;">HIGH SCORE: 0</div>
+            </div>
+        </div>
+
+        <!-- Sidebar Dashboard -->
+        <div class="sidebar">
+            <!-- Panel 1: Match Dashboard -->
+            <div class="panel">
+                <div class="panel-title">📊 Match Dashboard</div>
+                <div class="dash-grid">
+                    <div class="dash-card">
+                        <div class="dash-label">Mode</div>
+                        <div id="ui-mode" class="dash-value">SOLO</div>
+                    </div>
+                    <div class="dash-card">
+                        <div class="dash-label">Target</div>
+                        <div id="ui-target" class="dash-value alt">32</div>
+                    </div>
+                    <div class="dash-card">
+                        <div class="dash-label">Score</div>
+                        <div id="ui-score" class="dash-value yellow">0/0</div>
+                    </div>
+                    <div class="dash-card">
+                        <div class="dash-label">Balls</div>
+                        <div id="ui-balls" class="dash-value">6</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 2: Conditions -->
+            <div class="panel">
+                <div class="panel-title">🌱 Match Conditions</div>
+                <div class="dash-grid">
+                    <div class="dash-card">
+                        <div class="dash-label">Pitch Type</div>
+                        <div id="ui-pitch" class="dash-value" style="font-size: 13px;">NORMAL</div>
+                    </div>
+                    <div class="dash-card">
+                        <div class="dash-label">Bowler</div>
+                        <div id="ui-bowler" class="dash-value yellow" style="font-size: 13px;">PACER</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 3: Power Shot Meter -->
+            <div class="panel">
+                <div class="panel-title">⚡ Power Shot Meter</div>
+                <div class="meter-subtext">Fill meter to unlock KEY 'P'</div>
+                <div class="meter-container">
+                    <div id="ui-meter" class="meter-fill"></div>
+                </div>
+            </div>
+
+            <!-- Panel 4: Quick Controls Guide -->
+            <div class="panel">
+                <div class="panel-title">🎮 Quick Controls</div>
+                <div class="controls-info">
+                    <span class="key-tag">◀</span><span class="key-tag">▶</span> Move | 
+                    <span class="key-tag">▲</span> Loft | 
+                    <span class="key-tag">▼</span> Ground<br>
+                    <span class="key-tag">SPACE</span> Swing | 
+                    <span class="key-tag">P</span> Power Shot
+                </div>
+                <button class="guide-btn" onclick="toggleGuide()">? DETAILED GUIDE</button>
+            </div>
+        </div>
     </div>
 
-    <div id="instructions">
-      <strong>Desktop:</strong> Up/Down Arrows (Position Shot) | Space (Swing) | P (Power Shot)<br>
-      <strong>Mobile:</strong> Tap buttons below or tap Canvas directly to swing!
+    <!-- Mobile Touch Controls Bar -->
+    <div id="mobile-touch-container">
+        <div class="touch-row">
+            <button class="cyber-btn" id="m-btn-left">◀ Move L</button>
+            <button class="cyber-btn" id="m-btn-right">Move R ▶</button>
+            <button class="cyber-btn" id="m-btn-loft">▲ Loft</button>
+            <button class="cyber-btn" id="m-btn-ground">▼ Ground</button>
+        </div>
+        <div class="touch-row">
+            <button class="cyber-btn cyber-btn-action" id="m-btn-swing" style="flex: 2;">🏏 SWING (SPACE)</button>
+            <button class="cyber-btn cyber-btn-action" id="m-btn-power" style="flex: 1;">⚡ POWER (P)</button>
+        </div>
     </div>
-  </div>
+</div>
 
-  <script>
+<script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    // Game state tracking
-    let keys = { ArrowUp: false, ArrowDown: false, KeyP: false };
-    let gameState = {
-      score: 0,
-      balls: 0,
-      shotType: 'NORMAL', // 'LOFTED', 'GROUNDED', 'POWER'
-      powerGauge: 100,
-      statusMsg: 'TAP CANVAS OR SWING TO PLAY'
-    };
+    // Game Core Variables
+    let selectedMode = 'SOLO';
+    let isPlaying = false;
+    let runsScored = 0;
+    let wickets = 0;
+    let ballsRemaining = 6;
+    let targetRuns = 30;
+    let powerMeter = 0;
+    let shotType = 'NORMAL'; // 'LOFT', 'GROUND', 'POWER'
 
-    // Batsman & Ball positions
-    let batsman = { x: 580, y: 220, height: 40, width: 15 };
-    let ball = { x: 100, y: 240, vx: 0, vy: 0, radius: 6, isPitched: false, active: false };
+    let keys = {};
+    let batsmanX = 190;
+    let ball = { x: 200, y: 100, vx: 0, vy: 0, active: false };
 
-    // Initialize Game Loop
-    function init() {
-      resetBall();
-      requestAnimationFrame(gameLoop);
+    // Initialize Game
+    function setMode(mode) {
+        selectedMode = mode;
+        document.querySelectorAll('.mode-opt').forEach(el => el.classList.remove('active'));
+        event.target.classList.add('active');
+        document.getElementById('ui-mode').innerText = mode;
+    }
+
+    function startGame() {
+        isPlaying = true;
+        runsScored = 0;
+        wickets = 0;
+        ballsRemaining = 6;
+        powerMeter = 20;
+        targetRuns = selectedMode === 'SOLO' ? Math.floor(Math.random() * 15) + 20 : 35;
+        
+        document.getElementById('menuOverlay').style.display = 'none';
+        updateUI();
+        resetBall();
+    }
+
+    function updateUI() {
+        document.getElementById('ui-score').innerText = `${runsScored}/${wickets}`;
+        document.getElementById('ui-balls').innerText = ballsRemaining;
+        document.getElementById('ui-target').innerText = targetRuns;
+        document.getElementById('ui-meter').style.width = `${powerMeter}%`;
     }
 
     function resetBall() {
-      ball.x = 120;
-      ball.y = 230;
-      ball.vx = 4 + Math.random() * 3;
-      ball.vy = (Math.random() - 0.5) * 1.5;
-      ball.active = true;
+        ball.x = 195 + (Math.random() * 10 - 5);
+        ball.y = 110;
+        ball.vx = (Math.random() - 0.5) * 1.5;
+        ball.vy = 3.5 + Math.random() * 2;
+        ball.active = true;
     }
 
     function executeSwing() {
-      if (!ball.active) {
-        resetBall();
-        return;
-      }
+        if (!isPlaying || !ball.active) return;
 
-      // Check distance for hit detection
-      let dist = Math.abs(ball.x - batsman.x);
-      if (dist < 40) {
-        let runs = 0;
-        if (gameState.shotType === 'LOFTED') {
-          runs = Math.random() > 0.4 ? 6 : 0;
-        } else if (gameState.shotType === 'GROUNDED') {
-          runs = Math.random() > 0.2 ? 4 : 1;
-        } else if (gameState.shotType === 'POWER') {
-          runs = 6;
-          gameState.powerGauge = 0;
-        } else {
-          runs = Math.floor(Math.random() * 4);
+        let dist = Math.abs(ball.y - 480);
+        if (dist < 35 && Math.abs(ball.x - batsmanX) < 40) {
+            let hitRuns = 0;
+            if (shotType === 'LOFT') hitRuns = Math.random() > 0.4 ? 6 : 0;
+            else if (shotType === 'GROUND') hitRuns = Math.random() > 0.2 ? 4 : 1;
+            else if (shotType === 'POWER' && powerMeter >= 100) {
+                hitRuns = 6;
+                powerMeter = 0;
+            } else hitRuns = Math.floor(Math.random() * 4);
+
+            runsScored += hitRuns;
+            powerMeter = Math.min(100, powerMeter + 25);
+            ball.active = false;
+            ballsRemaining--;
+
+            checkGameOver();
+            updateUI();
+            if (isPlaying) setTimeout(resetBall, 1000);
         }
-
-        gameState.score += runs;
-        gameState.balls += 1;
-        gameState.statusMsg = runs > 0 ? `HIT! +${runs} RUNS` : 'DOT BALL!';
-        ball.active = false;
-        setTimeout(resetBall, 1200);
-      } else {
-        gameState.statusMsg = 'MISS!';
-      }
     }
 
-    // Input Handling (Keyboard)
+    function checkGameOver() {
+        if (ballsRemaining <= 0 || runsScored >= targetRuns) {
+            isPlaying = false;
+            setTimeout(() => {
+                alert(runsScored >= targetRuns ? '🎉 YOU WON THE MATCH!' : '❌ MATCH OVER - TARGET MISSED');
+                document.getElementById('menuOverlay').style.display = 'flex';
+            }, 300);
+        }
+    }
+
+    // Keydown/Keyup Listeners
     window.addEventListener('keydown', (e) => {
-      if (e.code === 'ArrowUp') { keys.ArrowUp = true; gameState.shotType = 'LOFTED'; }
-      if (e.code === 'ArrowDown') { keys.ArrowDown = true; gameState.shotType = 'GROUNDED'; }
-      if (e.code === 'KeyP' && gameState.powerGauge >= 100) { gameState.shotType = 'POWER'; }
-      if (e.code === 'Space') { executeSwing(); }
+        keys[e.code] = true;
+        if (e.code === 'ArrowUp') shotType = 'LOFT';
+        if (e.code === 'ArrowDown') shotType = 'GROUND';
+        if (e.code === 'KeyP' && powerMeter >= 100) shotType = 'POWER';
+        if (e.code === 'Space') executeSwing();
     });
 
     window.addEventListener('keyup', (e) => {
-      if (e.code === 'ArrowUp') keys.ArrowUp = false;
-      if (e.code === 'ArrowDown') keys.ArrowDown = false;
-      if (!keys.ArrowUp && !keys.ArrowDown) gameState.shotType = 'NORMAL';
+        keys[e.code] = false;
+        if (!keys['ArrowUp'] && !keys['ArrowDown']) shotType = 'NORMAL';
     });
 
-    // Touch Event Binding for Buttons
-    function bindTouchBtn(id, actionOn, actionOff) {
-      const btn = document.getElementById(id);
-      
-      const handleStart = (e) => {
-        e.preventDefault();
-        btn.classList.add('active');
-        actionOn();
-      };
-      
-      const handleEnd = (e) => {
-        e.preventDefault();
-        btn.classList.remove('active');
-        if (actionOff) actionOff();
-      };
+    // Mobile Event Binders
+    function bindVirtualKey(elementId, keyCode, key, code) {
+        const btn = document.getElementById(elementId);
+        if (!btn) return;
 
-      btn.addEventListener('touchstart', handleStart);
-      btn.addEventListener('touchend', handleEnd);
-      btn.addEventListener('mousedown', handleStart);
-      btn.addEventListener('mouseup', handleEnd);
+        const triggerDown = (e) => {
+            e.preventDefault();
+            btn.classList.add('active');
+            window.dispatchEvent(new KeyboardEvent('keydown', { key, code, keyCode, bubbles: true }));
+        };
+
+        const triggerUp = (e) => {
+            e.preventDefault();
+            btn.classList.remove('active');
+            window.dispatchEvent(new KeyboardEvent('keyup', { key, code, keyCode, bubbles: true }));
+        };
+
+        btn.addEventListener('touchstart', triggerDown, { passive: false });
+        btn.addEventListener('touchend', triggerUp, { passive: false });
+        btn.addEventListener('mousedown', triggerDown);
+        btn.addEventListener('mouseup', triggerUp);
     }
 
-    bindTouchBtn('btn-up', 
-      () => { gameState.shotType = 'LOFTED'; }, 
-      () => { gameState.shotType = 'NORMAL'; }
-    );
+    bindVirtualKey('m-btn-left', 37, 'ArrowLeft', 'ArrowLeft');
+    bindVirtualKey('m-btn-right', 39, 'ArrowRight', 'ArrowRight');
+    bindVirtualKey('m-btn-loft', 38, 'ArrowUp', 'ArrowUp');
+    bindVirtualKey('m-btn-ground', 40, 'ArrowDown', 'ArrowDown');
+    bindVirtualKey('m-btn-swing', 32, ' ', 'Space');
+    bindVirtualKey('m-btn-power', 80, 'p', 'KeyP');
 
-    bindTouchBtn('btn-down', 
-      () => { gameState.shotType = 'GROUNDED'; }, 
-      () => { gameState.shotType = 'NORMAL'; }
-    );
+    // Menu Buttons
+    function shareGame() { navigator.clipboard.writeText(window.location.href); alert('Game Link Copied!'); }
+    function toggleGuide() { alert('Control Batsman using Arrow Keys or Touch Buttons. Press SPACE or TAP SWING to hit!'); }
+    function rateItch() { window.open('https://itch.io', '_blank'); }
 
-    bindTouchBtn('btn-power', 
-      () => { 
-        if (gameState.powerGauge >= 100) {
-          gameState.shotType = 'POWER'; 
-          executeSwing();
-        }
-      }, 
-      () => { gameState.shotType = 'NORMAL'; }
-    );
-
-    // Direct Canvas Tap to Swing
-    canvas.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      executeSwing();
-    });
-
-    // Main Render Loop
+    // Game Loop
     function update() {
-      if (ball.active) {
-        ball.x += ball.vx;
-        ball.y += ball.vy;
+        if (keys['ArrowLeft'] && batsmanX > 140) batsmanX -= 3;
+        if (keys['ArrowRight'] && batsmanX < 240) batsmanX += 3;
 
-        if (ball.x > canvas.width) {
-          gameState.statusMsg = 'BOWLED / PASSED';
-          ball.active = false;
-          setTimeout(resetBall, 1200);
+        if (isPlaying && ball.active) {
+            ball.x += ball.vx;
+            ball.y += ball.vy;
+
+            if (ball.y > 540) {
+                ball.active = false;
+                ballsRemaining--;
+                checkGameOver();
+                updateUI();
+                if (isPlaying) setTimeout(resetBall, 1000);
+            }
         }
-      }
-
-      // Slowly refill power meter
-      if (gameState.powerGauge < 100) {
-        gameState.powerGauge += 0.1;
-      }
     }
 
     function render() {
-      // Clear screen
-      ctx.fillStyle = '#1a1c2b';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Field
+        ctx.fillStyle = '#2e7d32';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Pitch background
-      ctx.fillStyle = '#d2b48c';
-      ctx.fillRect(80, 200, 540, 70);
+        // Pitch
+        ctx.fillStyle = '#d2b48c';
+        ctx.fillRect(130, 80, 140, 420);
 
-      // Crease lines
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(140, 200, 4, 70);
-      ctx.fillRect(560, 200, 4, 70);
+        // Crease Lines
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(130, 140, 140, 3);
+        ctx.fillRect(130, 460, 140, 3);
 
-      // Draw Stumps
-      ctx.fillStyle = '#e67e22';
-      ctx.fillRect(570, 185, 4, 30); // Batsman Stumps
-      ctx.fillRect(130, 185, 4, 30); // Bowler Stumps
+        // Stumps
+        ctx.fillStyle = '#ffcc00';
+        ctx.fillRect(192, 115, 16, 4); // Bowler
+        ctx.fillRect(192, 470, 16, 4); // Batsman
 
-      // Draw Batsman
-      ctx.fillStyle = gameState.shotType === 'POWER' ? '#ff0055' : '#00ffcc';
-      ctx.fillRect(batsman.x, batsman.y - (keys.ArrowUp ? 15 : 0) + (keys.ArrowDown ? 10 : 0), batsman.width, batsman.height);
+        // Bowler
+        ctx.fillStyle = '#ff0055';
+        ctx.fillRect(190, 90, 20, 20);
 
-      // Draw Ball
-      if (ball.active) {
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-        ctx.fillStyle = '#ff3333';
-        ctx.fill();
-        ctx.closePath();
-      }
+        // Batsman
+        ctx.fillStyle = shotType === 'POWER' ? '#ff0055' : '#00ffcc';
+        ctx.fillRect(batsmanX, 480, 20, 24);
 
-      // HUD & Metrics
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '14px Courier New';
-      ctx.fillText(`SCORE: ${gameState.score} | BALLS: ${gameState.balls}`, 20, 30);
-      ctx.fillText(`SHOT: ${gameState.shotType}`, 20, 50);
-      ctx.fillText(`POWER: ${Math.floor(gameState.powerGauge)}%`, 20, 70);
-
-      // Status Banner
-      ctx.fillStyle = '#00ffcc';
-      ctx.font = '16px Courier New';
-      ctx.textAlign = 'center';
-      ctx.fillText(gameState.statusMsg, canvas.width / 2, 360);
-      ctx.textAlign = 'left';
+        // Ball
+        if (ball.active) {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            ctx.closePath();
+        }
     }
 
     function gameLoop() {
-      update();
-      render();
-      requestAnimationFrame(gameLoop);
+        update();
+        render();
+        requestAnimationFrame(gameLoop);
     }
 
-    // Launch game
-    init();
-  </script>
+    gameLoop();
+</script>
 </body>
 </html>
