@@ -32,7 +32,7 @@
       align-items: center;
       min-height: 100vh;
       padding: 15px 10px;
-      overflow: hidden; /* Prevents page scrolling on arrow keys */
+      overflow: hidden;
     }
 
     #game-wrapper {
@@ -48,11 +48,13 @@
     .main-header {
       text-align: center;
       color: var(--accent-cyan);
-      font-size: 22px;
-      font-weight: bold;
+      font-size: 24px;
+      font-weight: 900;
       margin-bottom: 15px;
-      text-shadow: 0 0 8px rgba(0, 255, 204, 0.6);
-      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(0, 255, 204, 0.8), 2px 2px 0px var(--accent-pink);
+      letter-spacing: 3px;
+      border-bottom: 1px dashed rgba(0, 255, 204, 0.3);
+      padding-bottom: 8px;
     }
 
     .layout-grid {
@@ -81,6 +83,38 @@
       background: #2e7d32;
       max-width: 100%;
       height: auto;
+      touch-action: none;
+    }
+
+    /* On-Canvas Touch Controls Overlay */
+    .canvas-touch-controls {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .touch-shot-btn {
+      pointer-events: auto;
+      background: rgba(20, 22, 34, 0.85);
+      color: var(--accent-cyan);
+      border: 2px solid var(--accent-cyan);
+      padding: 8px 12px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--accent-pink);
+    }
+
+    .touch-shot-btn.active {
+      background: var(--accent-cyan);
+      color: #0d0e15;
     }
 
     /* Sidebar Panels */
@@ -156,7 +190,7 @@
 
     .meter-fill {
       height: 100%;
-      width: 30%;
+      width: 35%;
       background: linear-gradient(90deg, #ff0055, #ffcc00, #00ffcc);
       transition: width 0.1s linear;
     }
@@ -198,19 +232,19 @@
       box-shadow: 2px 2px 0px var(--accent-cyan);
     }
 
-    /* Menu Overlay */
+    /* Overlay Screens */
     .overlay-screen {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(13, 14, 21, 0.92);
+      background: rgba(13, 14, 21, 0.94);
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       padding: 20px;
       text-align: center;
       z-index: 10;
@@ -224,13 +258,13 @@
     }
 
     .menu-btn {
-      width: 200px;
-      padding: 10px;
+      width: 210px;
+      padding: 9px;
       background: #141622;
       color: var(--accent-cyan);
       border: 2px solid var(--accent-cyan);
       font-family: inherit;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: bold;
       cursor: pointer;
       box-shadow: 3px 3px 0px var(--accent-pink);
@@ -241,60 +275,27 @@
       color: #0d0e15;
     }
 
-    /* Mobile Controls Bar */
-    #mobile-touch-container {
-      display: flex;
+    /* Modal Styling */
+    #guideModal {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(13, 14, 21, 0.96);
+      z-index: 20;
+      padding: 20px;
+      box-sizing: border-box;
       flex-direction: column;
-      gap: 8px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-box {
+      background: var(--card-bg);
+      border: 2px solid var(--accent-cyan);
+      padding: 15px;
+      max-width: 320px;
       width: 100%;
-      margin-top: 12px;
-      padding: 10px;
-      background: #0f111a;
-      border: 2px solid var(--accent-pink);
-      box-shadow: 3px 3px 0px var(--accent-cyan);
-      border-radius: 4px;
-    }
-
-    .touch-row {
-      display: flex;
-      gap: 8px;
-      width: 100%;
-    }
-
-    .cyber-btn {
-      flex: 1;
-      padding: 12px 4px;
-      background: #141622;
-      color: var(--accent-cyan);
-      border: 1px solid var(--accent-cyan);
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 11px;
-      font-weight: bold;
-      text-transform: uppercase;
-      border-radius: 2px;
-      cursor: pointer;
-      box-shadow: 2px 2px 0px var(--accent-pink);
-    }
-
-    .cyber-btn:active {
-      background: var(--accent-cyan);
-      color: #0d0e15;
-      transform: translate(2px, 2px);
-      box-shadow: none;
-    }
-
-    .cyber-btn-action {
-      background: #1e1326;
-      color: var(--accent-pink);
-      border-color: var(--accent-pink);
-      box-shadow: 2px 2px 0px var(--accent-cyan);
-    }
-
-    .cyber-btn-action:active {
-      background: var(--accent-pink);
-      color: #ffffff;
-      transform: translate(2px, 2px);
-      box-shadow: none;
+      box-shadow: 4px 4px 0px var(--accent-pink);
     }
   </style>
 </head>
@@ -308,12 +309,36 @@
     <div class="canvas-container">
       <canvas id="gameCanvas" width="380" height="520"></canvas>
 
+      <!-- On-Screen Shot Mode Buttons for Mobile -->
+      <div class="canvas-touch-controls">
+        <button class="touch-shot-btn" id="btn-loft" onclick="toggleShotMode('LOFT')">▲ LOFT</button>
+        <button class="touch-shot-btn" id="btn-ground" onclick="toggleShotMode('GROUND')">▼ GROUND</button>
+      </div>
+
       <!-- Menu Overlay -->
       <div id="menuOverlay" class="overlay-screen">
         <div class="overlay-title">PIXEL CRICKET</div>
         <div style="color: var(--accent-yellow); font-size: 11px;">v1.0 Ultimate Arcade Edition</div>
+        <div style="color: #aaa; font-size: 10px; margin-bottom: 5px;">Created by Odd Jobs Dev (Vimal Ram)</div>
+
         <button class="menu-btn primary" onclick="startGame()">► START MATCH</button>
-        <button class="menu-btn" onclick="toggleGuide()">? HOW TO PLAY</button>
+        <button class="menu-btn" onclick="shareGame()">🔗 SHARE GAME</button>
+        <button class="menu-btn" style="background:#ff0055; color:#fff;" onclick="openGuideModal()">? GAME GUIDE</button>
+        <button class="menu-btn" style="background:#ffcc00; color:#000;" onclick="rateItch()">⭐ RATE ON ITCH.IO</button>
+      </div>
+
+      <!-- Detailed Guide Modal -->
+      <div id="guideModal">
+        <div class="modal-box">
+          <div style="color: var(--accent-pink); font-size: 14px; font-weight: bold; margin-bottom: 10px;">🎮 HOW TO PLAY</div>
+          <div style="font-size: 11px; text-align: left; line-height: 1.6; color: #ccc;">
+            • <b>Desktop:</b> Arrow Left/Right to position batsman. Spacebar to Swing.<br>
+            • <b>Mobile:</b> Touch & drag left/right on pitch to position batsman. Tap pitch to Swing.<br>
+            • <b>Loft/Ground:</b> Use Arrow Up/Down or tap the screen buttons.<br>
+            • <b>Power Shot:</b> Fills automatically! When meter reaches 100%, next Spacebar / Tap releases a Power Shot!
+          </div>
+          <button class="guide-btn" onclick="closeGuideModal()" style="margin-top: 15px;">CLOSE</button>
+        </div>
       </div>
     </div>
 
@@ -332,11 +357,11 @@
           </div>
           <div class="dash-card">
             <div class="dash-label">SCORE</div>
-            <div id="ui-score" class="dash-value yellow">6/0</div>
+            <div id="ui-score" class="dash-value yellow">0/0</div>
           </div>
           <div class="dash-card">
             <div class="dash-label">BALLS</div>
-            <div id="ui-balls" class="dash-value">4</div>
+            <div id="ui-balls" class="dash-value">6</div>
           </div>
         </div>
       </div>
@@ -357,7 +382,7 @@
 
       <div class="panel">
         <div class="panel-title">⚡ POWER SHOT METER</div>
-        <div class="meter-subtext">Fill meter to unlock <b>KEY 'P'</b></div>
+        <div class="meter-subtext">Space / Tap automatically uses Power Shot at 100%</div>
         <div class="meter-container">
           <div id="ui-meter" class="meter-fill"></div>
         </div>
@@ -366,28 +391,13 @@
       <div class="panel">
         <div class="panel-title">🎮 QUICK CONTROLS</div>
         <div class="controls-info">
-          <span class="key-tag">◀</span><span class="key-tag">▶</span> Move | 
+          <span class="key-tag">◀</span><span class="key-tag">▶</span> Move / Drag | 
           <span class="key-tag">▲</span> Loft | 
           <span class="key-tag">▼</span> Ground<br>
-          <span class="key-tag">SPACE</span> Swing | 
-          <span class="key-tag">P</span> Power Shot
+          <span class="key-tag">SPACE / TAP</span> Swing & Power Shot
         </div>
-        <button class="guide-btn" onclick="toggleGuide()">? DETAILED GUIDE</button>
+        <button class="guide-btn" onclick="openGuideModal()">? DETAILED GUIDE</button>
       </div>
-    </div>
-  </div>
-
-  <!-- Mobile Touch Controls Bar -->
-  <div id="mobile-touch-container">
-    <div class="touch-row">
-      <button class="cyber-btn" id="m-btn-left">◀ Move L</button>
-      <button class="cyber-btn" id="m-btn-right">Move R ▶</button>
-      <button class="cyber-btn" id="m-btn-loft">▲ Loft</button>
-      <button class="cyber-btn" id="m-btn-ground">▼ Ground</button>
-    </div>
-    <div class="touch-row">
-      <button class="cyber-btn cyber-btn-action" id="m-btn-swing" style="flex: 2;">🏏 SWING (SPACE)</button>
-      <button class="cyber-btn cyber-btn-action" id="m-btn-power" style="flex: 1;">⚡ POWER (P)</button>
     </div>
   </div>
 </div>
@@ -414,18 +424,18 @@
 
   // Game States
   let isPlaying = false;
-  let runsScored = 6;
+  let runsScored = 0;
   let wickets = 0;
-  let ballsRemaining = 4;
+  let ballsRemaining = 6;
   let targetRuns = 32;
   let powerMeter = 35;
   let shotType = 'NORMAL';
-  let bannerText = "RUNS SCORED: 6";
+  let bannerText = "RUNS SCORED: 0";
   let popupCommentary = "";
   let popupTimer = 0;
 
   let keys = {};
-  let batsman = { x: 140, y: 440, swingAnim: 0 };
+  let batsman = { x: 180, y: 440, swingAnim: 0 };
   let bowler = { x: 180, y: 130, armAnim: 0 };
   let ball = { x: 190, y: 150, vx: 0, vy: 0, active: false };
 
@@ -436,23 +446,47 @@
     }
     keys[e.code] = true;
 
-    if (e.code === 'ArrowUp') shotType = 'LOFT';
-    if (e.code === 'ArrowDown') shotType = 'GROUND';
-    if (e.code === 'KeyP' && powerMeter >= 100) shotType = 'POWER';
+    if (e.code === 'ArrowUp') setShotMode('LOFT');
+    if (e.code === 'ArrowDown') setShotMode('GROUND');
     if (e.code === 'Space') executeSwing();
   });
 
   window.addEventListener('keyup', (e) => {
     keys[e.code] = false;
-    if (!keys['ArrowUp'] && !keys['ArrowDown']) shotType = 'NORMAL';
   });
+
+  // Mobile Pitch Touch Gesture Handling
+  let touchStartX = 0;
+  canvas.addEventListener('touchstart', (e) => {
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    touchStartX = touch.clientX - rect.left;
+    executeSwing();
+  }, { passive: true });
+
+  canvas.addEventListener('touchmove', (e) => {
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const touchX = touch.clientX - rect.left;
+    batsman.x = Math.max(130, Math.min(220, touchX));
+  }, { passive: true });
+
+  function setShotMode(mode) {
+    shotType = (shotType === mode) ? 'NORMAL' : mode;
+    document.getElementById('btn-loft').classList.toggle('active', shotType === 'LOFT');
+    document.getElementById('btn-ground').classList.toggle('active', shotType === 'GROUND');
+  }
+
+  function toggleShotMode(mode) {
+    setShotMode(mode);
+  }
 
   function startGame() {
     isPlaying = true;
     runsScored = 0;
     wickets = 0;
     ballsRemaining = 6;
-    powerMeter = 30;
+    powerMeter = 35;
     bannerText = "MATCH STARTED!";
     document.getElementById('menuOverlay').style.display = 'none';
     updateUI();
@@ -488,23 +522,24 @@
     let alignment = Math.abs(ball.x - batsman.x);
 
     if (dist < 40 && alignment < 45) {
-      playSound(520, 0.15, 'triangle'); // Bat contact sound
+      playSound(520, 0.15, 'triangle');
       let hitRuns = 0;
 
-      if (shotType === 'LOFT') {
-        hitRuns = Math.random() > 0.3 ? 6 : 0;
-      } else if (shotType === 'GROUND') {
-        hitRuns = Math.random() > 0.2 ? 4 : 2;
-      } else if (shotType === 'POWER' && powerMeter >= 100) {
+      // Auto Power Shot Execution
+      if (powerMeter >= 100) {
         hitRuns = 6;
         powerMeter = 0;
+        triggerPopup("⚡ POWER SHOT! 6 RUNS!");
+      } else if (shotType === 'LOFT') {
+        hitRuns = Math.random() > 0.3 ? 6 : 0;
+        triggerPopup(hitRuns === 6 ? "SIXER! OUT OF THE PARK!" : "CAUGHT OUT!");
+      } else if (shotType === 'GROUND') {
+        hitRuns = Math.random() > 0.2 ? 4 : 2;
+        triggerPopup(hitRuns === 4 ? "FOUR! GROUND SHOT!" : "2 RUNS!");
       } else {
         hitRuns = Math.floor(Math.random() * 4) + 1;
+        triggerPopup(`${hitRuns} RUNS TAKEN!`);
       }
-
-      if (hitRuns === 6) triggerPopup("SIXER! OUT OF THE PARK!");
-      else if (hitRuns === 4) triggerPopup("FOUR! BEAUTIFUL TIMING!");
-      else triggerPopup(`${hitRuns} RUNS TAKEN!`);
 
       runsScored += hitRuns;
       bannerText = `RUNS SCORED: ${hitRuns}`;
@@ -516,7 +551,7 @@
       updateUI();
       if (isPlaying) setTimeout(resetBall, 1200);
     } else {
-      playSound(180, 0.2, 'sawtooth'); // Swing and miss sound
+      playSound(180, 0.2, 'sawtooth');
     }
   }
 
@@ -525,7 +560,7 @@
       isPlaying = false;
       setTimeout(() => {
         if (runsScored >= targetRuns) playSound(880, 0.4, 'sine');
-        alert(runsScored >= targetRuns ? '🎉 YOU WON THE MATCH!' : '❌ MATCH OVER');
+        alert(runsScored >= targetRuns ? '🎉 YOU WON THE MATCH!' : '❌ MATCH OVER - TARGET MISSED');
         document.getElementById('menuOverlay').style.display = 'flex';
       }, 500);
     }
@@ -544,7 +579,7 @@
       ball.y += ball.vy;
 
       if (ball.y > 480) {
-        playSound(120, 0.3, 'sawtooth'); // Bowled / Passed sound
+        playSound(120, 0.3, 'sawtooth');
         triggerPopup("BOWLED / PASSED!");
         bannerText = "DOT BALL / BOWLED";
         ball.active = false;
@@ -556,8 +591,13 @@
     }
   }
 
-  function drawPitch() {
-    // Grass stripes
+  function render() {
+    // Clear entire canvas to prevent white artifacts/trails
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Grass Background & Stripes
+    ctx.fillStyle = '#2e7d32';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#266b2a';
     for (let i = 0; i < canvas.height; i += 40) {
       if ((i / 40) % 2 === 0) ctx.fillRect(0, i, canvas.width, 40);
@@ -573,32 +613,27 @@
     ctx.fillRect(130, 420, 120, 4);
 
     // Stumps (Top & Bottom)
-    ctx.fillStyle = '#ffffff';
     for (let i = 0; i < 3; i++) {
-      ctx.fillRect(182 + i * 6, 136, 3, 14); // Bowler wickets
-      ctx.fillRect(182 + i * 6, 424, 3, 14); // Batsman wickets
+      ctx.fillRect(182 + i * 6, 136, 3, 14);
+      ctx.fillRect(182 + i * 6, 424, 3, 14);
     }
-  }
 
-  function render() {
-    drawPitch();
-
-    // Bowler Sprite (Pink & Yellow Pixel Character)
+    // Bowler Sprite
     ctx.fillStyle = '#e0115f';
-    ctx.fillRect(bowler.x, bowler.y - 20, 20, 14); // Head
+    ctx.fillRect(bowler.x, bowler.y - 20, 20, 14);
     ctx.fillStyle = '#ffcc00';
-    ctx.fillRect(bowler.x, bowler.y - 6, 20, 18); // Body
+    ctx.fillRect(bowler.x, bowler.y - 6, 20, 18);
     ctx.fillStyle = '#e0115f';
-    ctx.fillRect(bowler.x - (bowler.armAnim > 0 ? 6 : 0), bowler.y - 2, 6, 12); // Arm
+    ctx.fillRect(bowler.x - (bowler.armAnim > 0 ? 6 : 0), bowler.y - 2, 6, 12);
 
-    // Batsman Sprite (Blue Helmet & White Pads)
+    // Batsman Sprite
     ctx.fillStyle = '#1e88e5';
-    ctx.fillRect(batsman.x, batsman.y - 20, 18, 16); // Helmet
+    ctx.fillRect(batsman.x, batsman.y - 20, 18, 16);
     ctx.fillStyle = '#d81b60';
-    ctx.fillRect(batsman.x + 2, batsman.y - 4, 14, 18); // Shirt
+    ctx.fillRect(batsman.x + 2, batsman.y - 4, 14, 18);
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(batsman.x, batsman.y + 14, 8, 16); // Left pad
-    ctx.fillRect(batsman.x + 10, batsman.y + 14, 8, 16); // Right pad
+    ctx.fillRect(batsman.x, batsman.y + 14, 8, 16);
+    ctx.fillRect(batsman.x + 10, batsman.y + 14, 8, 16);
 
     // Bat Sprite
     ctx.fillStyle = '#d2b48c';
@@ -625,7 +660,7 @@
     ctx.textAlign = 'center';
     ctx.fillText(bannerText, 190, 40);
 
-    // Floating Overlay Commentary Popup
+    // Floating Commentary Popup
     if (popupTimer > 0) {
       ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
       ctx.fillRect(40, 240, 300, 40);
@@ -634,42 +669,15 @@
       ctx.strokeRect(40, 240, 300, 40);
 
       ctx.fillStyle = '#ffcc00';
-      ctx.font = 'bold 14px "Courier New"';
+      ctx.font = 'bold 13px "Courier New"';
       ctx.fillText(popupCommentary, 190, 265);
     }
   }
 
-  // Virtual Key Binding for Mobile Controls
-  function bindVirtualKey(elementId, keyCode, key, code) {
-    const btn = document.getElementById(elementId);
-    if (!btn) return;
-
-    const triggerDown = (e) => {
-      e.preventDefault();
-      window.dispatchEvent(new KeyboardEvent('keydown', { key, code, keyCode, bubbles: true }));
-    };
-
-    const triggerUp = (e) => {
-      e.preventDefault();
-      window.dispatchEvent(new KeyboardEvent('keyup', { key, code, keyCode, bubbles: true }));
-    };
-
-    btn.addEventListener('touchstart', triggerDown, { passive: false });
-    btn.addEventListener('touchend', triggerUp, { passive: false });
-    btn.addEventListener('mousedown', triggerDown);
-    btn.addEventListener('mouseup', triggerUp);
-  }
-
-  bindVirtualKey('m-btn-left', 37, 'ArrowLeft', 'ArrowLeft');
-  bindVirtualKey('m-btn-right', 39, 'ArrowRight', 'ArrowRight');
-  bindVirtualKey('m-btn-loft', 38, 'ArrowUp', 'ArrowUp');
-  bindVirtualKey('m-btn-ground', 40, 'ArrowDown', 'ArrowDown');
-  bindVirtualKey('m-btn-swing', 32, ' ', 'Space');
-  bindVirtualKey('m-btn-power', 80, 'p', 'KeyP');
-
-  function toggleGuide() {
-    alert("CONTROLS:\n- Arrow Left/Right: Position Batsman\n- Arrow Up: Lofted Shot\n- Arrow Down: Grounded Shot\n- Spacebar: Swing Bat\n- P: Power Shot (When meter is full)");
-  }
+  function openGuideModal() { document.getElementById('guideModal').style.display = 'flex'; }
+  function closeGuideModal() { document.getElementById('guideModal').style.display = 'none'; }
+  function shareGame() { navigator.clipboard.writeText(window.location.href); alert('Game link copied to clipboard!'); }
+  function rateItch() { window.open('https://itch.io', '_blank'); }
 
   function gameLoop() {
     update();
