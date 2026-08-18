@@ -1,49 +1,83 @@
-# 🏏 Pixel Cricket v1 — Ultimate Arcade Edition
+# 🏏 Pixel Cricket v1 - Ultimate Arcade Edition
 
-A lightweight, arcade-style pixel cricket game built completely from scratch using pure **HTML5 Canvas, CSS, and Vanilla JavaScript**. Play in your desktop browser using physical keyboard controls or on mobile devices via responsive touch inputs!
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Language: HTML/JS](https://img.shields.io/badge/Made%20With-HTML5%20%26%20JS-blue)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Platform: Web](https://img.shields.io/badge/Platform-Browser%20%7C%20Mobile-brightgreen)](https://github.com/Vimal9RAM-NAP/pixel-cricket)
 
-[![Play Game](https://img.shields.io/badge/Play_Now-GitHub_Pages-00ffcc?style=for-the-badge&logo=github)](https://vimal9ram-nap.github.io/pixel-cricket/)
-[![Itch.io](https://img.shields.io/badge/Play_On-Itch.io-ff0055?style=for-the-badge&logo=itch.io)](https://itch.io)
-
----
-
-## ✨ Features
-
-- **🕹️ Pure Vanilla Tech Stack:** Built without any external game engines or third-party libraries.
-- **📱 Mobile & Desktop Cross-Play:** Fully responsive design featuring on-screen touch buttons for mobile browsers and keyboard shortcut bindings for desktop.
-- **🎯 Directional Shot Control:** Select your shot height and angle in real time:
-  - **Lofted Shot:** High risk, high reward over the boundary rope.
-  - **Grounded Drive:** Safe, low-trajectory shot into open gaps.
-  - **Super Power Shot:** Devastating high-velocity strike when the power meter hits 100%.
-- **⚡ Dynamic Power Meter:** Automatically charges over time to allow special power swings.
-- **📊 Live Match HUD:** Tracks total runs, ball count, shot selection, and power gauge percentage.
+A fast-paced, retro-styled browser cricket game built with HTML5 Canvas and Vanilla JavaScript. Features interactive bowling mechanics, customizable match modes, dynamic pitch types, synthesized retro audio, and full touch/keyboard controls.
 
 ---
 
-## 🎮 How to Play
+## 📸 Gameplay & Interface
 
-### 💻 Desktop Controls
-
-- <kbd>▲ Up Arrow</kbd> — Select **Lofted** shot
-- <kbd>▼ Down Arrow</kbd> — Select **Grounded** shot
-- <kbd>Spacebar</kbd> — Swing bat / Play delivery
-- <kbd>P</kbd> — Trigger **Super Power Shot** _(requires 100% power meter)_
-
-### 📱 Mobile Controls
-
-- Tap **▲ Lofted** / **▼ Grounded** on-screen buttons to adjust shot type.
-- Tap **⚡ POWER** to trigger a super power shot.
-- **Direct Screen Tap:** Tap anywhere on the game canvas to swing immediately!
+|                    🎮 Gameplay View                     |                  ⚙️ Main Menu                   |
+| :-----------------------------------------------------: | :---------------------------------------------: |
+| ![Gameplay Screenshot](./docs/screenshots/gameplay.png) | ![Menu Screenshot](./docs/screenshots/menu.png) |
 
 ---
 
-## 🛠️ Project Structure
+## ✨ Key Features
 
-```text
+- **Multiple Game Modes:**
+  - **SOLO:** Quick play against randomized target scores.
+  - **2P VS:** Local turn-based match setup.
+  - **🏆 WORLD CUP:** Tournament-style play mode.
+- **Dynamic Pitch & Bowling Conditions:**
+  - **Pitch Types:** Dusty, Green, Hard, and Dry variations with distinct pitch colorings.
+  - **Bowler Styles:** Fast, Swing, Medium Pace, and Spinner styles altering ball speed and trajectory.
+- **Special Shots & Match Overlays:**
+  - Ground Shots, Lofted Sixers, and an automatic **Power Shot** meter triggered at 100%.
+  - Arcade-style **Match Victory** and **Match Defeat** overlays directly rendered over the pitch canvas.
+- **Pure Web Technologies:**
+  - **Zero Dependencies:** Single-file HTML/JS execution—no npm install or build step required.
+  - **Web Audio API:** Built-in retro sound synthesis for hits, misses, and match wins/losses.
+  - **Responsive Canvas:** Full support for desktop keyboard layout and mobile touch/drag controls.
+
+---
+
+## 🎮 Controls Overview
+
+| Action               | Desktop Keyboard             | Mobile / Touch Screen           |
+| :------------------- | :--------------------------- | :------------------------------ |
+| **Move Batsman**     | `Left Arrow` / `Right Arrow` | Drag left or right on the pitch |
+| **Swing Bat**        | `Spacebar`                   | Tap pitch canvas                |
+| **Loft Shot Mode**   | `Up Arrow`                   | Tap `▲ LOFT` button             |
+| **Ground Shot Mode** | `Down Arrow`                 | Tap `▼ GROUND` button           |
+| **Power Shot**       | Auto-triggers at 100% Meter  | Auto-triggers at 100% Meter     |
+
+---
+
+## 🚀 How to Run
+
+```bash
+# 1. Clone the repository
+git clone [https://github.com/Vimal9RAM-NAP/pixel-cricket.git](https://github.com/Vimal9RAM-NAP/pixel-cricket.git)
+
+# 2. Navigate into the directory
+cd pixel-cricket
+
+# 3. Open in browser (or open index.html directly / use VS Code Live Server)
+code .
+📁 Repository Structure
 pixel-cricket/
 ├── docs/
-│   └── screenshots/     # Showcase images and GIFs
-├── index.html           # Full application logic (HTML, CSS & JS)
-├── LICENSE              # Open-source license (MIT)
-└── README.md            # Project documentation
+│   └── screenshots/
+│       ├── gameplay.png       # Gameplay screenshot
+│       └── menu.png           # Main menu screenshot
+├── index.html                 # Main game code (Canvas, CSS, JS)
+├── LICENSE                    # MIT License
+└── README.md                  # Project Documentation
+🛠️ Built With
+
+    HTML5 Canvas — 2D graphics rendering and animation loop
+
+    Vanilla JavaScript (ES6+) — Game logic, collision detection, and physics
+
+    Web Audio API — Real-time retro sound effect synthesis
+
+    CSS3 — Custom retro arcade UI layout
+
+📄 License
+
+Distributed under the MIT License. See LICENSE for more information.
 ```
