@@ -52,7 +52,7 @@ A fast-paced, retro-styled browser cricket game built with HTML5 Canvas and Vani
 
 ---
 
-## 🚀 How to Run
+##  How to Run
 
 1. **Clone the repository:**
    `git clone https://github.com/Vimal9RAM-NAP/pixel-cricket.git`
