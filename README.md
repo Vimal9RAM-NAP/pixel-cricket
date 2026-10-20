@@ -1,8 +1,9 @@
-# 🏏 Pixel Cricket v1 - Ultimate Arcade Edition
+#  Pixel Cricket v1 - Ultimate Arcade Edition
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Language: HTML/JS](https://img.shields.io/badge/Made%20With-HTML5%20%26%20JS-blue)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Platform: Web](https://img.shields.io/badge/Platform-Browser%20%7C%20Mobile-brightgreen)](https://github.com/Vimal9RAM-NAP/pixel-cricket)
+
 [![Pixel Cricket on itch.io](https://img.shields.io/badge/Play%20Pixel%20Cricket-itch.io-FA5C5C?style=for-the-badge&logo=itch.io&logoColor=white)](https://itch.io/embed-upload/18859789?color=333333)
 
 <a href="https://itch.io/embed-upload/18859789?color=333333">
@@ -13,20 +14,20 @@ A fast-paced, retro-styled browser cricket game built with HTML5 Canvas and Vani
 
 ---
 
-## 📸 Gameplay & Interface
+##  Gameplay & Interface
 
-|                    🎮 Gameplay View                     |                  ⚙️ Main Menu                   |
+|                     Gameplay View                       |                       Main Menu                 |
 | :-----------------------------------------------------: | :---------------------------------------------: |
 | ![Gameplay Screenshot](./docs/screenshots/gameplay.png) | ![Menu Screenshot](./docs/screenshots/menu.png) |
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 - **Multiple Game Modes:**
   - **SOLO:** Quick play against randomized target scores.
   - **2P VS:** Local turn-based match setup.
-  - **🏆 WORLD CUP:** Tournament-style play mode.
+  - **WORLD CUP:** Tournament-style play mode.
 - **Dynamic Pitch & Bowling Conditions:**
   - **Pitch Types:** Dusty, Green, Hard, and Dry variations with distinct pitch colorings.
   - **Bowler Styles:** Fast, Swing, Medium Pace, and Spinner styles altering ball speed and trajectory.
@@ -40,7 +41,7 @@ A fast-paced, retro-styled browser cricket game built with HTML5 Canvas and Vani
 
 ---
 
-## 🎮 Controls Overview
+##  Controls Overview
 
 | Action               | Desktop Keyboard             | Mobile / Touch Screen           |
 | :------------------- | :--------------------------- | :------------------------------ |
@@ -52,7 +53,7 @@ A fast-paced, retro-styled browser cricket game built with HTML5 Canvas and Vani
 
 ---
 
-## 🚀 How to Run
+##  How to Run
 
 1. **Clone the repository:**
    `git clone https://github.com/Vimal9RAM-NAP/pixel-cricket.git`
@@ -76,7 +77,7 @@ A fast-paced, retro-styled browser cricket game built with HTML5 Canvas and Vani
 
 ---
 
-## 🛠️ Built With
+##  Built With
 
 - **HTML5 Canvas** — 2D graphics rendering and animation loop
 - **Vanilla JavaScript (ES6+)** — Game logic, collision detection, and physics
@@ -85,7 +86,7 @@ A fast-paced, retro-styled browser cricket game built with HTML5 Canvas and Vani
 
 ---
 
-## 📄 License
+##  License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
